@@ -1,6 +1,7 @@
 from Delta import db
 from adafruit_servokit import ServoKit
 import time
+import csv
 
 kit = ServoKit(channels=16)
 
@@ -19,7 +20,8 @@ Delta = db(f,rf,re,r)
 mainLoop = True
 while mainLoop:
 
-    thetas = input("input theta1 theta2 theta3: ")
+    servoNum = int(input("Which Servo are you calibrating? "))
+    thetas = input("input theta: ")
 
     thetas = thetas.split(sep=" ")
     print(thetas)
@@ -27,13 +29,25 @@ while mainLoop:
         theta1 = thetas[0]
         theta2 = thetas[1]
         theta3 = thetas[2]
-
-        kit.servo[ServoAdr0].angle = float(theta1)
-        kit.servo[ServoAdr1].angle = float(theta2)
-        kit.servo[ServoAdr2].angle = float(theta3)
+        try:
+            kit.servo[ServoAdr0].angle = float(theta1)
+            kit.servo[ServoAdr1].angle = float(theta2)
+            kit.servo[ServoAdr2].angle = float(theta3)
+        except:
+            print("One or more of the servos is unaddressable")
     elif thetas[0] == "exit":
         mainLoop = False
     else:
-        kit.servo[ServoAdr0].angle = float(thetas[0])
-        kit.servo[ServoAdr1].angle = float(thetas[0])
-        kit.servo[ServoAdr2].angle = float(thetas[0])
+        try:
+            kit.servo[ServoAdr0].angle = float(thetas[0])
+            kit.servo[ServoAdr1].angle = float(thetas[0])
+            kit.servo[ServoAdr2].angle = float(thetas[0])
+            lastTheta = float(thetas[0])
+        except:
+            print("One or more of the servos is unaddressable")
+
+#will order servos 0 through 2 ranges on lines 2-4 of csv
+rangeList = []
+header = ['min','max']
+
+
