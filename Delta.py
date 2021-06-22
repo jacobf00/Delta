@@ -21,7 +21,7 @@ class db:
         self.re = Forearm
         self.r = EndEffectorRadius
 
-            #position increment in inches
+        #position increment in inches
         self.inc = .2 #in
         self.speed = botSpeed #in/s
         self.dlay = self.inc/self.speed #time delay between points
@@ -35,6 +35,9 @@ class db:
         self.minServo = 0
         self.maxServo = 180
         self.updateServoRange()
+
+    def updateServoRange(self):
+        pass
 
     def setServoAdr(self,servo,adr):
         try:
@@ -64,7 +67,10 @@ class db:
         except:
             raise SpeedError(f"Seriously? what kind of speed is {newspeed}?")
 
-    def trans(self,servoMin,servoMax,y1=0,y2=180):
+    def trans(self,thetaIn,y1=0,y2=180):
+        slope = (self.maxServo-self.minServo)/(y2-y1)
+        thetaOut = slope*thetaIn + self.minServo
+        return thetaOut
 
 
     def drop(self,seconds = .5):
@@ -217,15 +223,18 @@ class db:
             for ps in points:
                 thetas = self.reverse(ps[0],ps[1],ps[2])
                 if thetas[0] + self.theta0 + self.thetaDiff < 0 or thetas[1] + self.theta0 + self.thetaDiff < 0 or thetas[2] + self.theta0 + self.thetaDiff < 0:
-                    self.kit.servo[self.ServoAdr0].angle = 0
-                    self.kit.servo[self.ServoAdr1].angle = 0
-                    self.kit.servo[self.ServoAdr2].angle = 0
+                    self.kit.servo[self.ServoAdr0].angle = self.minServo
+                    self.kit.servo[self.ServoAdr1].angle = self.minServo
+                    self.kit.servo[self.ServoAdr2].angle = self.minServo
                     time.sleep(self.dlay)
                 else:
-                    try:
-                        self.kit.servo[self.ServoAdr0].angle = thetas[0] + self.theta0 + self.thetaDiff
-                        self.kit.servo[self.ServoAdr1].angle = thetas[1] + self.theta0 + self.thetaDiff
-                        self.kit.servo[self.ServoAdr2].angle = thetas[2] + self.theta0 + self.thetaDiff
+                    try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
+                        theta0 = self.trans(thetas[0] + self.theta0 + self.thetaDiff)
+                        theta1 = self.trans(thetas[1] + self.theta0 + self.thetaDiff)
+                        theta2 = self.trans(thetas[2] + self.theta0 + self.thetaDiff)
+                        self.kit.servo[self.ServoAdr0].angle = theta0
+                        self.kit.servo[self.ServoAdr1].angle = theta1
+                        self.kit.servo[self.ServoAdr2].angle = theta2
                         time.sleep(self.dlay)
                     except ValueError:
                         print("shitty servo no go brrrrrr")
@@ -234,9 +243,12 @@ class db:
     def fmove(self,x,y,z):
         thetas = self.reverse(x,y,z)
         try:
-            self.kit.servo[self.ServoAdr0].angle = thetas[0] + self.theta0 + self.thetaDiff
-            self.kit.servo[self.ServoAdr1].angle = thetas[1] + self.theta0 + self.thetaDiff
-            self.kit.servo[self.ServoAdr2].angle = thetas[2] + self.theta0 + self.thetaDiff
+            theta0 = self.trans(thetas[0] + self.theta0 + self.thetaDiff)
+            theta1 = self.trans(thetas[1] + self.theta0 + self.thetaDiff)
+            theta2 = self.trans(thetas[2] + self.theta0 + self.thetaDiff)
+            self.kit.servo[self.ServoAdr0].angle = theta0
+            self.kit.servo[self.ServoAdr1].angle = theta1
+            self.kit.servo[self.ServoAdr2].angle = theta2
         except ValueError:
             print("shitty servo no go brrrrrr")
 
