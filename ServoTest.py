@@ -93,8 +93,8 @@ try:
                 #print(row)
                 if rowNum-1 == servoNum:
                     row[minOrMax] = str(lastTheta)
-                    writer.writerow(row)
                     print(f"Servo {servoNum} {minOrMax} was updated")
+                writer.writerow(row)
 
 except FileNotFoundError:
     createServoRanges(filePath=filePath)
