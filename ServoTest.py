@@ -19,7 +19,7 @@ Delta = db(f,rf,re,r)
 
 def createServoRanges():
     header = ['min','max']
-    with open("data\servo_ranges.csv",'w') as newFile:
+    with open("data/servo_ranges.csv",'w') as newFile:
         writer = csv.writer(newFile,lineterminator='\n')
         for i in range(4):
             if i == 0:
@@ -75,14 +75,14 @@ while mainLoop:
 
 try:
     rowNum = 0
-    with open("data\servo_ranges.csv",'r') as servoRanges:
+    with open("data/servo_ranges.csv",'r') as servoRanges:
         reader = csv.DictReader(servoRanges)
         for row in reader:
             rowNum += 1
-            print(row)
+            #print(row)
             if rowNum-1 == servoNum:
-                row[minOrMax] = lastTheta
-                print(f"Servo {rowNum} {minOrMax} was updated")
+                row[minOrMax] = str(lastTheta)
+                print(f"Servo {servoNum} {minOrMax} was updated")
 
 except FileNotFoundError:
     createServoRanges()
