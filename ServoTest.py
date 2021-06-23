@@ -69,7 +69,7 @@ while mainLoop:
             kit.servo[ServoAdr2].angle = float(thetas[0])
         except:
             print(f"Servo {ServoAdr2} is unaddressable")
-            lastTheta = float(thetas[0])
+        lastTheta = float(thetas[0])
 
 #will order servos 0 through 2 ranges on lines 2-4 of csv
 
