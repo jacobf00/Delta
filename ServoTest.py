@@ -1,7 +1,12 @@
+import os
 from Delta import db
 from adafruit_servokit import ServoKit
 import time
 import csv
+
+class TableError(Exception):
+    '''The csv file for holding the ranges did not exist'''
+    pass
 
 kit = ServoKit(channels=16)
 
@@ -17,9 +22,9 @@ speed = 24 #bot speed (in/s)
 
 Delta = db(f,rf,re,r)
 
-def createServoRanges():
+def createServoRanges(filePath):
     header = ['min','max']
-    with open("data/servo_ranges.csv",'w') as newFile:
+    with open(filePath,'w') as newFile:
         writer = csv.writer(newFile,lineterminator='\n')
         for i in range(4):
             if i == 0:
@@ -75,15 +80,26 @@ while mainLoop:
 
 try:
     rowNum = 0
-    with open("data/servo_ranges.csv",'r') as servoRanges:
+    filePath = "data/servo_ranges.csv"
+    newFilePath = "data/servo_rangesnew.csv"
+    with open(filePath,'r') as servoRanges:
         reader = csv.DictReader(servoRanges)
-        for row in reader:
-            rowNum += 1
-            #print(row)
-            if rowNum-1 == servoNum:
-                row[minOrMax] = str(lastTheta)
-                print(f"Servo {servoNum} {minOrMax} was updated")
+        header = reader.fieldnames
+        with open(newFilePath,'w') as writeFile:
+            writer = csv.DictWriter(writeFile,fieldnames=header,lineterminator='\n')
+            writer.writeheader()
+            for row in reader:
+                rowNum += 1
+                #print(row)
+                if rowNum-1 == servoNum:
+                    row[minOrMax] = str(lastTheta)
+                    writer.writerow(row)
+                    print(f"Servo {servoNum} {minOrMax} was updated")
 
 except FileNotFoundError:
-    createServoRanges()
+    createServoRanges(filePath=filePath)
     print("Table created, nothing updated.\nTry again")
+    #raise TableError()
+
+os.remove(filePath)
+os.rename(newFilePath,filePath)
