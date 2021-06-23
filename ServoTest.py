@@ -95,11 +95,11 @@ try:
                     row[minOrMax] = str(lastTheta)
                     print(f"Servo {servoNum} {minOrMax} was updated")
                 writer.writerow(row)
+    os.remove(filePath)
+    os.rename(newFilePath,filePath)
 
 except FileNotFoundError:
     createServoRanges(filePath=filePath)
     print("Table created, nothing updated.\nTry again")
     #raise TableError()
 
-os.remove(filePath)
-os.rename(newFilePath,filePath)
