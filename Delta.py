@@ -4,6 +4,8 @@ import numpy as np
 import time
 from adafruit_servokit import ServoKit
 import piplates.RELAYplate as RELAY
+from ServoTest import filePath
+import csv
 
 #Set custom Delta exception(s)
 class SpeedError(Exception):
@@ -32,12 +34,21 @@ class db:
         self.ServoAdr0 = int(servoAdress0)
         self.ServoAdr1 = int(servoAddress1)
         self.ServoAdr2 = int(servoAdress2)
-        self.minServo = 0
-        self.maxServo = 180
+        # self.minServo = 0
+        # self.maxServo = 180
         self.updateServoRange()
 
     def updateServoRange(self):
-        pass
+        #list is ordered servos 0-2 on indices 0-2
+        self.minServos = []
+        self.maxServos = []
+        with open(filePath,'r') as servoRanges:
+            reader = csv.DictReader(servoRanges)
+            for row in reader:
+                self.minServos.append(int(row['min']))
+                self.maxServos.append(int(row['max']))
+        
+
 
     def setServoAdr(self,servo,adr):
         try:
@@ -67,8 +78,8 @@ class db:
         except:
             raise SpeedError(f"Seriously? what kind of speed is {newspeed}?")
 
-    def trans(self,thetaIn,y1=0,y2=180):
-        slope = (self.maxServo-self.minServo)/(y2-y1)
+    def trans(self,thetaIn,realServoMin=0,realServoMax=180):
+        slope = (self.maxServo-self.minServo)/(realServoMax-realServoMin)
         thetaOut = slope*thetaIn + self.minServo
         return thetaOut
 

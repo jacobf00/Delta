@@ -36,11 +36,11 @@ def createServoRanges(filePath):
 
 servoNum = int(input("Which Servo are you calibrating?(0-2) "))
 minOrMax = input("Are you finding the min or max?(no capitals) ")
-
+print("MAKE SURE YOU EXIT WHEN MIN/MAX IS FOUND")
 mainLoop = True
 while mainLoop:
 
-    thetas = input("MAKE SURE YOU EXIT WHEN MIN/MAX IS FOUND\ninput theta: ")
+    thetas = input("input theta: ")
     thetas = thetas.split(sep=" ")
     #print(thetas)
     if len(thetas) == 3:
