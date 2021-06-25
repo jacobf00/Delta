@@ -6,6 +6,7 @@ from adafruit_servokit import ServoKit
 import piplates.RELAYplate as RELAY
 from ServoTest import filePath
 import csv
+import threading
 
 #Set custom Delta exception(s)
 class SpeedError(Exception):
@@ -28,7 +29,7 @@ class db:
         self.speed = botSpeed #in/s
         self.dlay = self.inc/self.speed #time delay between points
         self.thetaDiff = -16.8 #deg
-        self.theta0 = 77 #deg
+        self.theta0 = [77,77,77] #deg
         #initialize servos
         self.kit = ServoKit(channels=16)
         self.ServoAdr0 = int(servoAdress0)
@@ -78,9 +79,9 @@ class db:
         except:
             raise SpeedError(f"Seriously? what kind of speed is {newspeed}?")
 
-    def trans(self,thetaIn,realServoMin=0,realServoMax=180):
-        slope = (self.maxServo-self.minServo)/(realServoMax-realServoMin)
-        thetaOut = slope*thetaIn + self.minServo
+    def trans(self,thetaIn,servoNum,realServoMin=0,realServoMax=180):
+        slope = (self.maxServos[servoNum]-self.minServos[servoNum])/(realServoMax-realServoMin)
+        thetaOut = slope*thetaIn + self.minServos[servoNum]
         return thetaOut
 
 
@@ -186,6 +187,17 @@ class db:
         y0 = (a2*z0 + b2)/dnm
         return (x0,y0,z0)
 
+    def setAngles(self,thetas:list):
+        theta0 = self.trans(thetas[0] + self.theta0[0] + self.thetaDiff,0)
+        theta1 = self.trans(thetas[1] + self.theta0[1] + self.thetaDiff,1)
+        theta2 = self.trans(thetas[2] + self.theta0[2] + self.thetaDiff,2)
+        self.kit.servo[self.ServoAdr0].angle = theta0
+        self.kit.servo[self.ServoAdr1].angle = theta1
+        self.kit.servo[self.ServoAdr2].angle = theta2
+        time.sleep(self.dlay)
+
+
+
     def dist(self,point1,point2):
         distance = sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2 + (point1[2]-point2[2])**2)
         return distance
@@ -240,13 +252,9 @@ class db:
                     time.sleep(self.dlay)
                 else:
                     try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
-                        theta0 = self.trans(thetas[0] + self.theta0 + self.thetaDiff)
-                        theta1 = self.trans(thetas[1] + self.theta0 + self.thetaDiff)
-                        theta2 = self.trans(thetas[2] + self.theta0 + self.thetaDiff)
-                        self.kit.servo[self.ServoAdr0].angle = theta0
-                        self.kit.servo[self.ServoAdr1].angle = theta1
-                        self.kit.servo[self.ServoAdr2].angle = theta2
-                        time.sleep(self.dlay)
+                        thread1 = threading.Thread(target=self.setAngles(thetas))
+                        thread1.start()
+                        thread1.join()
                     except ValueError:
                         print("shitty servo no go brrrrrr")
 
