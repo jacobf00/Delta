@@ -18,7 +18,7 @@ class ServoAdrError(Exception):
 #construct deltabot class
 class db:
 
-    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed=12,servoAdress0=0,servoAddress1=1,servoAdress2=2):
+    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed=12,servoAddress0=0,servoAddress1=1,servoAddress2=2):
         self.f = FixedBaseRadius
         self.rf = Bicep
         self.re = Forearm
@@ -31,10 +31,10 @@ class db:
         self.thetaDiff = -16.8 #deg
         self.theta0 = [77,77,77] #deg
         #initialize servos
-        self.kit = ServoKit(channels=16)
-        self.ServoAdr0 = int(servoAdress0)
+        self.kit = ServoKit(channels=16,frequency=100)
+        self.ServoAdr0 = int(servoAddress0)
         self.ServoAdr1 = int(servoAddress1)
-        self.ServoAdr2 = int(servoAdress2)
+        self.ServoAdr2 = int(servoAddress2)
         # self.minServo = 0
         # self.maxServo = 180
         self.updateServoRange()
@@ -226,17 +226,21 @@ class db:
     def home(self):
         '''Sets the servos to 45 degrees'''
         angle = 45
-        
-        homeAngles = self.theta0 + angle
-        homepos = (self.forward(homeAngles,homeAngles,homeAngles))
+        # thetas = [self.theta0[0],self.theta0[1],self.theta0[2]]
+        # for theta in thetas:
+        #     theta += angle
 
+        # self.setAngles(thetas)
+
+        homeAngles = [self.theta0[0] + angle,self.theta0[1] + angle,self.theta0[2] + angle]
+        homepos = (self.forward(*homeAngles))
         self.move(*homepos)
         
 
 
     def move(self,x,y,z):
         #find the current position from the servo motor angles
-        origpos = self.forward(self.kit.servo[self.ServoAdr0].angle - self.theta0 - self.thetaDiff,self.kit.servo[self.ServoAdr1].angle - self.theta0 - self.thetaDiff,self.kit.servo[self.ServoAdr2].angle - self.theta0 - self.thetaDiff)
+        origpos = self.forward(self.kit.servo[self.ServoAdr0].angle - self.theta0[0] - self.thetaDiff,self.kit.servo[self.ServoAdr1].angle - self.theta0[1] - self.thetaDiff,self.kit.servo[self.ServoAdr2].angle - self.theta0[2] - self.thetaDiff)
         newpos = (x,y,z)
         points = self.interp(origpos,newpos)
 
@@ -245,7 +249,7 @@ class db:
 
             for ps in points:
                 thetas = self.reverse(ps[0],ps[1],ps[2])
-                if thetas[0] + self.theta0 + self.thetaDiff < 0 or thetas[1] + self.theta0 + self.thetaDiff < 0 or thetas[2] + self.theta0 + self.thetaDiff < 0:
+                if thetas[0] + self.theta0[0] + self.thetaDiff < 0 or thetas[1] + self.theta0[1] + self.thetaDiff < 0 or thetas[2] + self.theta0[2] + self.thetaDiff < 0:
                     self.kit.servo[self.ServoAdr0].angle = self.minServo
                     self.kit.servo[self.ServoAdr1].angle = self.minServo
                     self.kit.servo[self.ServoAdr2].angle = self.minServo
@@ -263,9 +267,9 @@ class db:
     def fmove(self,x,y,z):
         thetas = self.reverse(x,y,z)
         try:
-            theta0 = self.trans(thetas[0] + self.theta0 + self.thetaDiff)
-            theta1 = self.trans(thetas[1] + self.theta0 + self.thetaDiff)
-            theta2 = self.trans(thetas[2] + self.theta0 + self.thetaDiff)
+            theta0 = self.trans(thetas[0] + self.theta0[0] + self.thetaDiff)
+            theta1 = self.trans(thetas[1] + self.theta0[1] + self.thetaDiff)
+            theta2 = self.trans(thetas[2] + self.theta0[2] + self.thetaDiff)
             self.kit.servo[self.ServoAdr0].angle = theta0
             self.kit.servo[self.ServoAdr1].angle = theta1
             self.kit.servo[self.ServoAdr2].angle = theta2
@@ -276,7 +280,7 @@ class db:
     def retract(self,RetractDist):
         ret = RetractDist
         #find current position
-        pos = self.forward(self.kit.servo[self.ServoAdr0].angle - self.theta0 - self.thetaDiff,self.kit.servo[self.ServoAdr1].angle - self.theta0 - self.thetaDiff,self.kit.servo[self.ServoAdr2].angle - self.theta0 - self.thetaDiff)
+        pos = self.forward(self.kit.servo[self.ServoAdr0].angle - self.theta0[0] - self.thetaDiff,self.kit.servo[self.ServoAdr1].angle - self.theta0[1] - self.thetaDiff,self.kit.servo[self.ServoAdr2].angle - self.theta0[2] - self.thetaDiff)
         #add retraction distance to position
         newposz = pos[2] + ret
         self.move(pos[0],pos[1],newposz)

@@ -1,4 +1,4 @@
-from Delta import db
+from Delta import *
 import time
 from PointField import points
 #from adafruit_servokit import ServoKit
@@ -23,7 +23,7 @@ def controlled(Delta,points):
         x,y,z = p[0],p[1],p[2]
         Delta.move(x,y,z)
 
-def trays(Delta,points,returnpoint):
+def trays(Delta:db,points,returnpoint):
     Delta.setSpeed(20)
     for p in points:
         x,y,z = p[0],p[1],p[2]
