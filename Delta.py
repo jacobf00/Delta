@@ -194,7 +194,7 @@ class db:
         self.kit.servo[self.ServoAdr0].angle = theta0
         self.kit.servo[self.ServoAdr1].angle = theta1
         self.kit.servo[self.ServoAdr2].angle = theta2
-        time.sleep(self.dlay)
+        #time.sleep(self.dlay)
 
 
 
@@ -254,6 +254,7 @@ class db:
                     try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
                         thread1 = threading.Thread(target=self.setAngles(thetas))
                         thread1.start()
+                        time.sleep(self.dlay)
                         thread1.join()
                     except ValueError:
                         print("shitty servo no go brrrrrr")
