@@ -57,11 +57,11 @@ if __name__ == "__main__":
             except:
                 print(f"Servo {ServoAdr0} is unaddressable")
             try:
-                kit.servo[ServoAdr1].angle = float(thetas[0])
+                kit.servo[ServoAdr1].angle = float(thetas[1])
             except:
                 print(f"Servo {ServoAdr1} is unaddressable")
             try:
-                kit.servo[ServoAdr2].angle = float(thetas[0])
+                kit.servo[ServoAdr2].angle = float(thetas[2])
             except:
                 print(f"Servo {ServoAdr2} is unaddressable")
         elif thetas[0] == "exit":

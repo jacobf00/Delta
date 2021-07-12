@@ -105,7 +105,7 @@ class SimulatedDeltaBot(object):
 
 if __name__ == '__main__':
 
-    bot = SimulatedDeltaBot(servo_link_length = 8.0, parallel_link_length = 27.385,
+    bot = SimulatedDeltaBot(servo_link_length = 7, parallel_link_length = 27.385,
                             servo_displacement = 5.0, effector_displacement = 2.3125)
 
     step=10

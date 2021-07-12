@@ -4,14 +4,6 @@ from PointField import points
 #from adafruit_servokit import ServoKit
 
 
-f = 6.25 #fixed base radius (in)
-rf = 7.98 #Bicep length (in)
-re = 25 #Forearm length (in)
-r = 2.3125  #end effector radius (in)
-speed = 24 #bot speed (in/s)
-
-Delta1 = db(f,rf,re,r,speed)
-
 def fast(Delta,points,delay):
     for p in points:
         x,y,z = p[0],p[1],p[2]
@@ -23,7 +15,7 @@ def controlled(Delta,points):
         x,y,z = p[0],p[1],p[2]
         Delta.move(x,y,z)
 
-def trays(Delta:db,points,returnpoint):
+def trays(Delta:db,points:list,returnpoint):
     Delta.setSpeed(20)
     for p in points:
         x,y,z = p[0],p[1],p[2]
@@ -36,6 +28,14 @@ def trays(Delta:db,points,returnpoint):
         #time.sleep(.5)
 
 if __name__ == '__main__':
+    
+    f = 6.25 #fixed base radius (in)
+    rf = 7.98 #Bicep length (in)
+    re = 25 #Forearm length (in)
+    r = 2.3125  #end effector radius (in)
+    speed = 24 #bot speed (in/s)
+
+    Delta1 = db(f,rf,re,r,speed)
 
     length = 18
     width = 15
