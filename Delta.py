@@ -4,7 +4,7 @@ import numpy as np
 import time
 from adafruit_servokit import ServoKit
 import piplates.RELAYplate as RELAY
-from ServoTest import filePath
+from dev.ServoTest import filePath
 import csv
 import threading
 
@@ -250,9 +250,10 @@ class db:
             for ps in points:
                 thetas = self.reverse(ps[0],ps[1],ps[2])
                 if thetas[0] + self.theta0[0] + self.thetaDiff < 0 or thetas[1] + self.theta0[1] + self.thetaDiff < 0 or thetas[2] + self.theta0[2] + self.thetaDiff < 0:
-                    self.kit.servo[self.ServoAdr0].angle = self.minServo
-                    self.kit.servo[self.ServoAdr1].angle = self.minServo
-                    self.kit.servo[self.ServoAdr2].angle = self.minServo
+                    print("Angle is less than servo min")
+                    self.kit.servo[self.ServoAdr0].angle = 0 #self.minServos[0]
+                    self.kit.servo[self.ServoAdr1].angle = 0 #self.minServos[1]
+                    self.kit.servo[self.ServoAdr2].angle = 0 #self.minServos[2]
                     time.sleep(self.dlay)
                 else:
                     try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
@@ -267,12 +268,7 @@ class db:
     def fmove(self,x,y,z):
         thetas = self.reverse(x,y,z)
         try:
-            theta0 = self.trans(thetas[0] + self.theta0[0] + self.thetaDiff)
-            theta1 = self.trans(thetas[1] + self.theta0[1] + self.thetaDiff)
-            theta2 = self.trans(thetas[2] + self.theta0[2] + self.thetaDiff)
-            self.kit.servo[self.ServoAdr0].angle = theta0
-            self.kit.servo[self.ServoAdr1].angle = theta1
-            self.kit.servo[self.ServoAdr2].angle = theta2
+            self.setAngles(thetas)
         except ValueError:
             print("shitty servo no go brrrrrr")
 
