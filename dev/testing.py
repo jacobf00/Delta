@@ -12,24 +12,35 @@ point2 = np.array([10, 50, 50])
 # d and we're set
 d = -point.dot(normal)
 
-lengthStart = -22
-lengthEnd = 22
-widthStart = -12
-widthEnd = 12
+# lengthStart = -22
+# lengthEnd = 22
+# widthStart = -12
+# widthEnd = 12
 
-xx,yy = np.meshgrid(range(lengthStart,lengthEnd+1),range(widthStart,widthEnd+1))
+# xx,yy = np.meshgrid(range(lengthStart,lengthEnd+1),range(widthStart,widthEnd+1))
 
-# calculate corresponding z
-z = (-normal[0] * xx - normal[1] * yy - d) * 1. /normal[2]
+# # calculate corresponding z
+# z = (-normal[0] * xx - normal[1] * yy - d) * 1. /normal[2]
 
-fig = plt.figure()
-ax = fig.add_subplot(1,1,1, projection='3d')
+# fig = plt.figure()
+# ax = fig.add_subplot(1,1,1, projection='3d')
 
 
-ax.plot_surface(xx,yy,z,alpha=.2)
+# ax.plot_surface(xx,yy,z,alpha=.2)
 
-plt.show()
+# plt.show()
 
-print('xs = \n',xx,'\n')
-print('ys = \n',yy,'\n')
-print('zs = \n',z)
+# print('xs = \n',xx,'\n')
+# print('ys = \n',yy,'\n')
+# print('zs = \n',z)
+
+ls = []
+sum = 0
+
+for i in range(1000):
+    if i % 3 == 0 or i % 5 == 0:
+        ls.append(i)
+        sum += i
+
+print(sum)
+
