@@ -1,6 +1,7 @@
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import os
 
 point  = np.array([0, 0, -20])
 normal = np.array([0, 0, 1])
@@ -34,13 +35,25 @@ d = -point.dot(normal)
 # print('ys = \n',yy,'\n')
 # print('zs = \n',z)
 
-ls = []
-sum = 0
+# ls = []
+# sum = 0
 
-for i in range(1000):
-    if i % 3 == 0 or i % 5 == 0:
-        ls.append(i)
-        sum += i
+# for i in range(1000):
+#     if i % 3 == 0 or i % 5 == 0:
+#         ls.append(i)
+#         sum += i
 
-print(sum)
+# print(sum)
 
+curPath = os.path.dirname(__file__)
+
+newPath = os.path.relpath(r'C:\Users\function\Documents\Delta\data\key.key',curPath)
+
+def showNum(num=1) -> int:
+    with open(newPath,'rb') as file:
+        key = file.read()
+    print(key)
+    return num
+
+num = showNum(5)
+print(num)
