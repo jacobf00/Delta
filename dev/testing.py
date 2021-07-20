@@ -45,15 +45,18 @@ d = -point.dot(normal)
 
 # print(sum)
 
-curPath = os.path.dirname(__file__)
+# curPath = os.path.dirname(__file__)
 
-newPath = os.path.relpath(r'C:\Users\function\Documents\Delta\data\key.key',curPath)
+# newPath = os.path.relpath(r'C:\Users\function\Documents\Delta\data\key.key',curPath)
 
-def showNum(num=1) -> int:
-    with open(newPath,'rb') as file:
-        key = file.read()
-    print(key)
-    return num
+# def showNum(num=1) -> int:
+#     with open(newPath,'rb') as file:
+#         key = file.read()
+#     print(key)
+#     return num
 
-num = showNum(5)
-print(num)
+# num = showNum(5)
+# print(num)
+
+nums = '1,2,3'
+print(nums.split(sep=','))

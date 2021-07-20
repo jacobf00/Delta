@@ -1,6 +1,6 @@
-from Delta import *
+from Delta import db
 import time
-from PointField import points
+from points import points
 #from adafruit_servokit import ServoKit
 
 
