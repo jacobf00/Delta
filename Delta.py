@@ -43,11 +43,13 @@ class db:
         #list is ordered servos 0-2 on indices 0-2
         self.minServos = []
         self.maxServos = []
-        with open(filePath,'r') as servoRanges:
-            reader = csv.DictReader(servoRanges)
-            for row in reader:
-                self.minServos.append(int(row['min']))
-                self.maxServos.append(int(row['max']))
+        self.minServos = [0,0,0]
+        self.maxServos = [180,180,180]
+        # with open(filePath,'r') as servoRanges:
+        #     reader = csv.DictReader(servoRanges)
+        #     for row in reader:
+        #         self.minServos.append(int(row['min']))
+        #         self.maxServos.append(int(row['max']))
         
 
 
