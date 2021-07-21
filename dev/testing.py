@@ -2,6 +2,8 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import os
+import threading
+import time
 
 point  = np.array([0, 0, -20])
 normal = np.array([0, 0, 1])
@@ -61,13 +63,21 @@ d = -point.dot(normal)
 # nums = '1,2,3'
 # print(nums.split(sep=','))
 
-class test:
-        
-    def lprint(*a,**b):
+lock = threading.Lock()
+    
+def lprint(*a,**b):
+    time.sleep(5)
+    with lock:
         print(*a,**b)
 
-    def showNums():
+def showNums():
+    nums = 12414
+    lprint("numbers are" + str(nums) + " " + str(1))
 
-        nums = 12414
+t1 = threading.Thread(target=lprint,args=("hello" + "world"))
+t1.start()
 
-        lprint("numbers are" + str(nums) + " " + str(1))
+with lock:
+    print("should print first")
+
+

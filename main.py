@@ -2,7 +2,6 @@ import motion
 from Delta import db
 from points import points
 import time
-import threading
 import multiprocessing
 from comm import comm
 from common.tools import *
@@ -10,7 +9,6 @@ from common.tools import *
 
 #manager = multiprocessing.Manager()
 ns = {}
-lock = threading.Lock()
 
 ns['serverAdr'] = '10.6.1.26'
 ns['serverPort'] = 5001
@@ -40,7 +38,7 @@ def serverMessageHandler():
                 updatePropertyThread.start()
             time.sleep(.1)
     except Exception as e:
-        print(e)
+        lprint(e)
 
 
 
@@ -60,8 +58,9 @@ def updateProperty(propertyName,newValue):
 
 
 if __name__ == '__main__':
-    commThread = threading.Thread(target=com.listen())
+    commThread = threading.Thread(target=com.listen)
     commThread.start()
+
     lprint("commThread started")
 
     f = 6.25 #fixed base radius (in)

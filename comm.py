@@ -45,6 +45,7 @@ class comm:
                     self.currentServerMessage = clientData
                 clientData = clientData.split(sep=':')
                 if clientData[0] == 'kill':
+                    lprint("Kill command received...shutting down comms")
                     run = False
                 if clientData[0] in comm.commands:
                     lprint("received valid command")
