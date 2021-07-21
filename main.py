@@ -16,6 +16,11 @@ ns['listenPort'] = 5002
 ns['serverMessageHandlerRunning'] = True
 com = comm(Inet=ns['serverAdr'],send_port=ns['serverPort'],listen_port=ns['listenPort'])
 
+def lprint(*a,**b):
+    with lock:
+        print(*a,**b)
+
+
 def serverMessageHandler():
     '''checks for incoming server messages and handles them'''
     try:
@@ -51,15 +56,15 @@ def checkServerMessage():
         com.currentServerMessage = ""
     return clientData
 
-def updateProperty(property,newValue):
+def updateProperty(propertyName,newValue):
     with lock:
-        ns[property] = newValue
+        ns[propertyName] = newValue
 
 
 if __name__ == '__main__':
     commThread = threading.Thread(target=com.listen())
     commThread.start()
-    print("commThread started")
+    lprint("commThread started")
 
     f = 6.25 #fixed base radius (in)
     rf = 7.98 #Bicep length (in)
@@ -80,7 +85,7 @@ if __name__ == '__main__':
     ps.pfShift(-length/2,-width/2,0)
 
     retpoint = (12,0,-18)
-    print('points generated, delta object created')
+    lprint('points generated, delta object created')
     serverMessageHandler()
 
 

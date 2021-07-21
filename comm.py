@@ -3,6 +3,7 @@ import socket
 import threading
 import multiprocessing
 from cryptography.fernet import Fernet
+from main import *
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection'''
@@ -28,31 +29,31 @@ class comm:
         s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         s.bind(addr)
         s.listen(100)
-        print("listening on port " + str(self.listenPort) + "...")
+        lprint("listening on port " + str(self.listenPort) + "...")
         run = True
         while(run):
             try:
                 c,ServerAdr = s.accept()
-                print("Connection established, receiving data...")
+                lprint("Connection established, receiving data...")
                 clientData = c.recv(1024)
                 if self.encrytionEnabled:
                     clientData = comm.crypt.decrypt(clientData).decode('UTF-8')
                 else:
                     clientData = clientData.decode('UTF-8')
-                print("received " + clientData + " from " + str(ServerAdr))
+                lprint("received " + clientData + " from " + str(ServerAdr))
                 with comm.lock:
                     self.currentServerMessage = clientData
                 clientData = clientData.split(sep=':')
                 if clientData[0] == 'kill':
                     run = False
                 if clientData[0] in comm.commands:
-                    print("received valid command")
+                    lprint("received valid command")
                 else:
-                    print("received invalid command")
+                    lprint("received invalid command")
                 #return clientData
             except Exception as e:
-                print('data could not be retrieved/decoded')
-                print(e)
+                lprint('data could not be retrieved/decoded')
+                lprint(e)
                 return 'error'
             finally:
                 c.close()

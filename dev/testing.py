@@ -58,5 +58,12 @@ d = -point.dot(normal)
 # num = showNum(5)
 # print(num)
 
-nums = '1,2,3'
-print(nums.split(sep=','))
+# nums = '1,2,3'
+# print(nums.split(sep=','))
+
+def lprint(*a,**b):
+    print(*a,**b)
+
+nums = 12414
+
+lprint("numbers are" + str(nums) + " " + str(1))
