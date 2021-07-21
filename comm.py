@@ -3,7 +3,7 @@ import socket
 import threading
 import multiprocessing
 from cryptography.fernet import Fernet
-from main import *
+from common.tools import *
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection'''

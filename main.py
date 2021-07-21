@@ -5,6 +5,8 @@ import time
 import threading
 import multiprocessing
 from comm import comm
+from common.tools import *
+
 
 #manager = multiprocessing.Manager()
 ns = {}
@@ -15,10 +17,6 @@ ns['serverPort'] = 5001
 ns['listenPort'] = 5002
 ns['serverMessageHandlerRunning'] = True
 com = comm(Inet=ns['serverAdr'],send_port=ns['serverPort'],listen_port=ns['listenPort'])
-
-def lprint(*a,**b):
-    with lock:
-        print(*a,**b)
 
 
 def serverMessageHandler():
