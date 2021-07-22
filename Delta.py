@@ -93,7 +93,7 @@ class db:
         except:
             raise SpeedError(f"Seriously? what kind of speed is {newspeed}?")
 
-    def trans(self,thetaIn,servoNum:int,realServoMin=0,realServoMax=360):
+    def trans(self,thetaIn:float,servoNum:int,realServoMin=0,realServoMax=360) -> float:
         slope = (self.maxServos[servoNum]-self.minServos[servoNum])/(realServoMax-realServoMin)
         thetaOut = slope*thetaIn + self.minServos[servoNum]
         return thetaOut
@@ -202,9 +202,9 @@ class db:
         return (x0,y0,z0)
 
     def setAngles(self,thetas:list):
-        theta0 = self.trans(thetas[0] + self.theta0[0] + self.thetaDiff,0)
-        theta1 = self.trans(thetas[1] + self.theta0[1] + self.thetaDiff,1)
-        theta2 = self.trans(thetas[2] + self.theta0[2] + self.thetaDiff,2)
+        theta0 = round(self.trans(thetas[0] + self.theta0[0] + self.thetaDiff,0))
+        theta1 = round(self.trans(thetas[1] + self.theta0[1] + self.thetaDiff,1))
+        theta2 = round(self.trans(thetas[2] + self.theta0[2] + self.thetaDiff,2))
         self.servo1.setPosition(theta0)
         self.servo2.setPosition(theta1)
         self.servo3.setPosition(theta2)
