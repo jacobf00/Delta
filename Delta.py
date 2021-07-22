@@ -4,8 +4,8 @@ import numpy as np
 import time
 from adafruit_servokit import ServoKit
 import piplates.RELAYplate as RELAY
-from dev.ServoTest import filePath
-import csv
+#from dev.ServoTest import filePath
+#import csv
 import threading
 
 #Set custom Delta exception(s)

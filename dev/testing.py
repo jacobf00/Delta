@@ -63,21 +63,29 @@ d = -point.dot(normal)
 # nums = '1,2,3'
 # print(nums.split(sep=','))
 
-lock = threading.Lock()
+# lock = threading.Lock()
     
-def lprint(*a,**b):
-    time.sleep(5)
-    with lock:
-        print(*a,**b)
+# def lprint(*a,**b):
+#     time.sleep(5)
+#     with lock:
+#         print(*a,**b)
 
-def showNums():
-    nums = 12414
-    lprint("numbers are" + str(nums) + " " + str(1))
+# def showNums():
+#     nums = 12414
+#     lprint("numbers are" + str(nums) + " " + str(1))
 
-t1 = threading.Thread(target=lprint,args=("hello" + "world"))
-t1.start()
+# t1 = threading.Thread(target=lprint,args=("hello" + "world"))
+# t1.start()
 
-with lock:
-    print("should print first")
+# with lock:
+#     print("should print first")
 
+class test:
+    
+    print("hello world")
+
+    def __init__(self) -> None:
+        print("hello init")
+
+#test1 = test()
 

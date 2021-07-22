@@ -11,7 +11,6 @@ class comm:
     with open('data/key.key','rb') as file:
         key = file.read()
 
-    lock = threading.Lock()
     crypt = Fernet(key)
     commands = ('move','remember','kill','updateProperty')
 
@@ -41,7 +40,7 @@ class comm:
                 else:
                     clientData = clientData.decode('UTF-8')
                 lprint("received " + clientData + " from " + str(ServerAdr))
-                with comm.lock:
+                with lock:
                     self.currentServerMessage = clientData
                 clientData = clientData.split(sep=':')
                 if clientData[0] == 'kill':
