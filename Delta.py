@@ -7,6 +7,7 @@ import piplates.RELAYplate as RELAY
 #from dev.ServoTest import filePath
 #import csv
 import threading
+from common.servo_service import servo
 
 #Set custom Delta exception(s)
 class SpeedError(Exception):
@@ -28,29 +29,40 @@ class db:
         self.inc = .2 #in
         self.speed = botSpeed #in/s
         self.dlay = self.inc/self.speed #time delay between points
-        self.thetaDiff = -16.8 #deg
-        self.theta0 = [77,77,77] #deg
+        self.thetaDiff = 0 #deg
+        self.theta0 = [0,0,0] #deg
         #initialize servos
-        self.kit = ServoKit(channels=16,frequency=100)
-        self.ServoAdr0 = int(servoAddress0)
-        self.ServoAdr1 = int(servoAddress1)
-        self.ServoAdr2 = int(servoAddress2)
         # self.minServo = 0
         # self.maxServo = 180
         self.updateServoRange()
+        self.createServos()
+
+    def createServos(self):
+        self.servo1 = servo(Dynamixel_ID=1)
+        self.servo2 = servo(Dynamixel_ID=2)
+        self.servo3 = servo(Dynamixel_ID=3)
 
     def updateServoRange(self):
         #list is ordered servos 0-2 on indices 0-2
         self.minServos = []
         self.maxServos = []
         self.minServos = [0,0,0]
-        self.maxServos = [180,180,180]
+        self.maxServos = [4095,4095,4095]
         # with open(filePath,'r') as servoRanges:
         #     reader = csv.DictReader(servoRanges)
         #     for row in reader:
         #         self.minServos.append(int(row['min']))
         #         self.maxServos.append(int(row['max']))
-        
+
+    def enableTorque(self):
+        self.servo1.enableTorque()
+        self.servo2.enableTorque()
+        self.servo3.enableTorque()
+
+    def disableTorque(self):
+        self.servo1.disableTorque()
+        self.servo2.disableTorque()
+        self.servo3.disableTorque()
 
 
     def setServoAdr(self,servo,adr):
@@ -81,7 +93,7 @@ class db:
         except:
             raise SpeedError(f"Seriously? what kind of speed is {newspeed}?")
 
-    def trans(self,thetaIn,servoNum,realServoMin=0,realServoMax=180):
+    def trans(self,thetaIn,servoNum:int,realServoMin=0,realServoMax=360):
         slope = (self.maxServos[servoNum]-self.minServos[servoNum])/(realServoMax-realServoMin)
         thetaOut = slope*thetaIn + self.minServos[servoNum]
         return thetaOut
@@ -193,9 +205,10 @@ class db:
         theta0 = self.trans(thetas[0] + self.theta0[0] + self.thetaDiff,0)
         theta1 = self.trans(thetas[1] + self.theta0[1] + self.thetaDiff,1)
         theta2 = self.trans(thetas[2] + self.theta0[2] + self.thetaDiff,2)
-        self.kit.servo[self.ServoAdr0].angle = theta0
-        self.kit.servo[self.ServoAdr1].angle = theta1
-        self.kit.servo[self.ServoAdr2].angle = theta2
+        self.servo1.setPosition(theta0)
+        self.servo2.setPosition(theta1)
+        self.servo3.setPosition(theta2)
+
         #time.sleep(self.dlay)
 
 
@@ -251,11 +264,10 @@ class db:
 
             for ps in points:
                 thetas = self.reverse(ps[0],ps[1],ps[2])
-                if thetas[0] + self.theta0[0] + self.thetaDiff < 0 or thetas[1] + self.theta0[1] + self.thetaDiff < 0 or thetas[2] + self.theta0[2] + self.thetaDiff < 0:
+                if thetas[0] + self.theta0[0] + self.thetaDiff < -90 or thetas[1] + self.theta0[1] + self.thetaDiff < -90 or thetas[2] + self.theta0[2] + self.thetaDiff < -90:
                     print("Angle is less than servo min")
-                    self.kit.servo[self.ServoAdr0].angle = 0 #self.minServos[0]
-                    self.kit.servo[self.ServoAdr1].angle = 0 #self.minServos[1]
-                    self.kit.servo[self.ServoAdr2].angle = 0 #self.minServos[2]
+                    thetas = (0,0,0)
+                    self.setAngles(thetas=thetas)
                     time.sleep(self.dlay)
                 else:
                     try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range

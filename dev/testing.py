@@ -80,12 +80,18 @@ d = -point.dot(normal)
 # with lock:
 #     print("should print first")
 
-class test:
-    
-    print("hello world")
+# class test:
 
-    def __init__(self) -> None:
-        print("hello init")
+#     print("hello world")
 
-#test1 = test()
+#     def __init__(self) -> None:
+#         print("hello init")
 
+# #test1 = test()
+
+nums = [3,2,1]
+
+def numPrint(num1,num2,num3):
+    print(num1 + num2 + num3)
+
+numPrint(*nums)

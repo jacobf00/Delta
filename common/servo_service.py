@@ -23,6 +23,8 @@ class servo:
             print("[ID:%03d] reboot Succeeded\n" % self.DXL_ID)
 
 
+
+
     #********* DYNAMIXEL Model definition *********
     #***** (Use only one definition at a time) *****
     MY_DXL = 'X_SERIES'       # X330 (5.0 V recommended), X430, X540, 2X430
@@ -38,6 +40,8 @@ class servo:
         ADDR_TORQUE_ENABLE          = 64
         ADDR_GOAL_POSITION          = 116
         ADDR_PRESENT_POSITION       = 132
+        ADDR_GOAL_VELOCITY          = 104
+        ADDR_ID                     = 7
         DXL_MINIMUM_POSITION_VALUE  = 0         # Refer to the Minimum Position Limit of product eManual
         DXL_MAXIMUM_POSITION_VALUE  = 4095      # Refer to the Maximum Position Limit of product eManual
         BAUDRATE                    = 57600
@@ -75,6 +79,7 @@ class servo:
     TORQUE_ENABLE               = 1     # Value for enabling the torque
     TORQUE_DISABLE              = 0     # Value for disabling the torque
     DXL_MOVING_STATUS_THRESHOLD = 10    # Dynamixel moving status threshold
+    GOAL_VELOCITY               = 800
 
 
 
@@ -104,6 +109,22 @@ class servo:
         lprint("Failed to change the baudrate")
         lprint("Press any key to terminate...")
         quit()
+
+    def setGoalVelocity(self,velocity:int):
+        self.setControlTableValue(servo.ADDR_GOAL_VELOCITY,velocity)
+
+    def setId(self,newId:int):
+        self.setControlTableValue(servo.ADDR_ID,newId)
+        self.setId(newId)
+
+    def setControlTableValue(self,address:int,value:int): 
+        dxl_comm_result, dxl_error = servo.packetHandler.write1ByteTxRx(servo.portHandler, self.DXL_ID, address, value)
+        if dxl_comm_result != COMM_SUCCESS:
+            lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+        elif dxl_error != 0:
+            lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+        else:
+            lprint("Control table value changed successfully")
 
     def enableTorque(self):
         # Enable Dynamixel Torque
