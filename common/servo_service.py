@@ -149,7 +149,7 @@ class servo:
         elif dxl_error != 0:
             lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
         else:
-            lprint("Dynamixel has been successfully connected")
+            lprint(f"Dynamixel {self.DXL_ID} has been successfully connected")
 
     def disableTorque(self):
         # Disable Dynamixel Torque
