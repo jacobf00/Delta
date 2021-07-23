@@ -1,5 +1,5 @@
 from dynamixel_sdk import * # Uses Dynamixel SDK library
-from tools import *
+from common.tools import *
 
 class servo:
 
