@@ -117,6 +117,10 @@ class servo:
         self.setControlTableValue(servo.ADDR_ID,newId)
         self.setId(newId)
 
+    def readCurrentPosition(self) -> int:
+        return self.readControlTableValue(servo.ADDR_PRESENT_POSITION)
+
+
     def setControlTableValue(self,address:int,value:int): 
         dxl_comm_result, dxl_error = servo.packetHandler.write1ByteTxRx(servo.portHandler, self.DXL_ID, address, value)
         if dxl_comm_result != COMM_SUCCESS:
@@ -125,6 +129,17 @@ class servo:
             lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
         else:
             lprint("Control table value changed successfully")
+
+    def readControlTableValue(self,address:int,) -> int:
+        if (servo.MY_DXL == 'XL320'): # XL320 uses 2 byte Position Data, Check the size of data in your DYNAMIXEL's control table
+            tableValue, dxl_comm_result, dxl_error = servo.packetHandler.read2ByteTxRx(servo.portHandler, self.DXL_ID, address)
+        else:
+            tableValue, dxl_comm_result, dxl_error = servo.packetHandler.read4ByteTxRx(servo.portHandler, self.DXL_ID, address)
+        if dxl_comm_result != COMM_SUCCESS:
+            lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+        elif dxl_error != 0:
+            lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+        return tableValue
 
     def enableTorque(self):
         # Enable Dynamixel Torque
@@ -169,7 +184,7 @@ class servo:
                 if (servo.MY_DXL == 'XL320'): # XL320 uses 2 byte Position Data, Check the size of data in your DYNAMIXEL's control table
                     dxl_present_position, dxl_comm_result, dxl_error = servo.packetHandler.read2ByteTxRx(servo.portHandler, self.DXL_ID, servo.ADDR_PRESENT_POSITION)
                 else:
-                    dxl_present_position, dxl_comm_result, dxl_error = servo.packetHandler.read4ByteTxRx(servo.portHandler, servo.DXL_ID, servo.ADDR_PRESENT_POSITION)
+                    dxl_present_position, dxl_comm_result, dxl_error = servo.packetHandler.read4ByteTxRx(servo.portHandler, self.DXL_ID, servo.ADDR_PRESENT_POSITION)
                 if dxl_comm_result != COMM_SUCCESS:
                     lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
                 elif dxl_error != 0:

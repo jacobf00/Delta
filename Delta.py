@@ -2,7 +2,6 @@
 from math import *
 import numpy as np
 import time
-from adafruit_servokit import ServoKit
 import piplates.RELAYplate as RELAY
 #from dev.ServoTest import filePath
 #import csv
@@ -30,7 +29,7 @@ class db:
         self.speed = botSpeed #in/s
         self.dlay = self.inc/self.speed #time delay between points
         self.thetaDiff = 0 #deg
-        self.theta0 = [0,0,0] #deg
+        self.theta0 = [180,180,180] #deg
         #initialize servos
         # self.minServo = 0
         # self.maxServo = 180
@@ -93,10 +92,15 @@ class db:
         except:
             raise SpeedError(f"Seriously? what kind of speed is {newspeed}?")
 
-    def trans(self,thetaIn:float,servoNum:int,realServoMin=0,realServoMax=360) -> float:
-        slope = (self.maxServos[servoNum]-self.minServos[servoNum])/(realServoMax-realServoMin)
-        thetaOut = slope*thetaIn + self.minServos[servoNum]
-        return thetaOut
+    def trans(self,thetaIn:float,realServoMin=0,realServoMax=360,toDegrees=False) -> float:
+        if not toDegrees:
+            slope = (servo.DXL_MAXIMUM_POSITION_VALUE-servo.DXL_MINIMUM_POSITION_VALUE)/(realServoMax-realServoMin)
+            thetaOut = slope*thetaIn + servo.DXL_MINIMUM_POSITION_VALUE
+            return thetaOut
+        else:
+            slope = (realServoMax-realServoMin)/(servo.DXL_MAXIMUM_POSITION_VALUE-servo.DXL_MINIMUM_POSITION_VALUE)
+            thetaOut = slope*thetaIn + realServoMin
+            return thetaOut
 
 
     def drop(self,seconds = .5):
@@ -201,15 +205,21 @@ class db:
         y0 = (a2*z0 + b2)/dnm
         return (x0,y0,z0)
 
-    def setAngles(self,thetas:list):
-        theta0 = round(self.trans(thetas[0] + self.theta0[0] + self.thetaDiff,0))
-        theta1 = round(self.trans(thetas[1] + self.theta0[1] + self.thetaDiff,1))
-        theta2 = round(self.trans(thetas[2] + self.theta0[2] + self.thetaDiff,2))
+    def setAngles(self,thetas:tuple):
+        theta0 = round(self.trans(-thetas[0] + self.theta0[0] + self.thetaDiff,0))
+        theta1 = round(self.trans(-thetas[1] + self.theta0[1] + self.thetaDiff,1))
+        theta2 = round(self.trans(-thetas[2] + self.theta0[2] + self.thetaDiff,2))
         self.servo1.setPosition(theta0)
         self.servo2.setPosition(theta1)
         self.servo3.setPosition(theta2)
 
         #time.sleep(self.dlay)
+
+    def getCurrentAngles(self) -> tuple:
+        theta0 = self.trans(self.servo1.readCurrentPosition,toDegrees=True)
+        theta1 = self.trans(self.servo2.readCurrentPosition,toDegrees=True)
+        theta2 = self.trans(self.servo3.readCurrentPosition,toDegrees=True)
+        return (theta0,theta1,theta2)
 
 
 
@@ -247,15 +257,14 @@ class db:
 
         # self.setAngles(thetas)
 
-        homeAngles = [self.theta0[0] + angle,self.theta0[1] + angle,self.theta0[2] + angle]
-        homepos = (self.forward(*homeAngles))
-        self.move(*homepos)
+        homeAngles = (angle,angle,angle)
+        self.setAngles(homeAngles)
         
 
 
     def move(self,x,y,z):
         #find the current position from the servo motor angles
-        origpos = self.forward(self.kit.servo[self.ServoAdr0].angle - self.theta0[0] - self.thetaDiff,self.kit.servo[self.ServoAdr1].angle - self.theta0[1] - self.thetaDiff,self.kit.servo[self.ServoAdr2].angle - self.theta0[2] - self.thetaDiff)
+        origpos = self.forward(*self.getCurrentAngles())
         newpos = (x,y,z)
         points = self.interp(origpos,newpos)
 
@@ -264,14 +273,19 @@ class db:
 
             for ps in points:
                 thetas = self.reverse(ps[0],ps[1],ps[2])
-                if thetas[0] + self.theta0[0] + self.thetaDiff < -90 or thetas[1] + self.theta0[1] + self.thetaDiff < -90 or thetas[2] + self.theta0[2] + self.thetaDiff < -90:
-                    print("Angle is less than servo min")
+                if (
+                    thetas[0] + self.theta0[0] + self.thetaDiff < -75 or thetas[1] + self.theta0[1] + self.thetaDiff < -75 or thetas[2] + self.theta0[2] + self.thetaDiff < -75
+                    or thetas[0] + self.theta0[0] + self.thetaDiff > 75 or thetas[1] + self.theta0[1] + self.thetaDiff > 75 or thetas[2] + self.theta0[2] + self.thetaDiff > 75
+                    ):
+                    print("Angle is out of range")
                     thetas = (0,0,0)
-                    self.setAngles(thetas=thetas)
+                    thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
+                    thread1.start()
                     time.sleep(self.dlay)
+                    thread1.join()
                 else:
                     try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
-                        thread1 = threading.Thread(target=self.setAngles(thetas))
+                        thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
                         thread1.start()
                         time.sleep(self.dlay)
                         thread1.join()
@@ -290,7 +304,7 @@ class db:
     def retract(self,RetractDist):
         ret = RetractDist
         #find current position
-        pos = self.forward(self.kit.servo[self.ServoAdr0].angle - self.theta0[0] - self.thetaDiff,self.kit.servo[self.ServoAdr1].angle - self.theta0[1] - self.thetaDiff,self.kit.servo[self.ServoAdr2].angle - self.theta0[2] - self.thetaDiff)
+        pos = self.forward(*self.getCurrentAngles())
         #add retraction distance to position
         newposz = pos[2] + ret
         self.move(pos[0],pos[1],newposz)
