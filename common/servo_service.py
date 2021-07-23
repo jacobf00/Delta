@@ -179,18 +179,18 @@ class servo:
             elif dxl_error != 0:
                 lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
 
-            while 1:
-                # Read present position
-                if (servo.MY_DXL == 'XL320'): # XL320 uses 2 byte Position Data, Check the size of data in your DYNAMIXEL's control table
-                    dxl_present_position, dxl_comm_result, dxl_error = servo.packetHandler.read2ByteTxRx(servo.portHandler, self.DXL_ID, servo.ADDR_PRESENT_POSITION)
-                else:
-                    dxl_present_position, dxl_comm_result, dxl_error = servo.packetHandler.read4ByteTxRx(servo.portHandler, self.DXL_ID, servo.ADDR_PRESENT_POSITION)
-                if dxl_comm_result != COMM_SUCCESS:
-                    lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
-                elif dxl_error != 0:
-                    lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            # while 1:
+            #     # Read present position
+            #     if (servo.MY_DXL == 'XL320'): # XL320 uses 2 byte Position Data, Check the size of data in your DYNAMIXEL's control table
+            #         dxl_present_position, dxl_comm_result, dxl_error = servo.packetHandler.read2ByteTxRx(servo.portHandler, self.DXL_ID, servo.ADDR_PRESENT_POSITION)
+            #     else:
+            #         dxl_present_position, dxl_comm_result, dxl_error = servo.packetHandler.read4ByteTxRx(servo.portHandler, self.DXL_ID, servo.ADDR_PRESENT_POSITION)
+            #     if dxl_comm_result != COMM_SUCCESS:
+            #         lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            #     elif dxl_error != 0:
+            #         lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
 
-                #lprint("[ID:%03d] GoalPos:%03d  PresPos:%03d" % (self.DXL_ID, dxl_goal_position, dxl_present_position))
+            #     #lprint("[ID:%03d] GoalPos:%03d  PresPos:%03d" % (self.DXL_ID, dxl_goal_position, dxl_present_position))
 
-                if not abs(dxl_goal_position - dxl_present_position) > servo.DXL_MOVING_STATUS_THRESHOLD:
-                    break
+            #     if not abs(dxl_goal_position - dxl_present_position) > servo.DXL_MOVING_STATUS_THRESHOLD:
+            #         break
