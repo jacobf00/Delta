@@ -190,7 +190,7 @@ class servo:
                 elif dxl_error != 0:
                     lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
 
-                lprint("[ID:%03d] GoalPos:%03d  PresPos:%03d" % (self.DXL_ID, dxl_goal_position, dxl_present_position))
+                #lprint("[ID:%03d] GoalPos:%03d  PresPos:%03d" % (self.DXL_ID, dxl_goal_position, dxl_present_position))
 
                 if not abs(dxl_goal_position - dxl_present_position) > servo.DXL_MOVING_STATUS_THRESHOLD:
                     break
