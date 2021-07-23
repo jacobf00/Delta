@@ -30,8 +30,10 @@ def serverMessageHandler():
         if clientData[0] == 'kill':
             ns['serverMessageHandlerRunning'] = False
         elif clientData[0] == 'reboot':
-            os.system('sudo reboot')
-        if clientData[0] == 'move':
+            reboot()
+        elif clientData[0] == 'home':
+            Delta1.home()
+        elif clientData[0] == 'move':
             newargs = []
             for i in args:
                 i = float(i)
@@ -62,6 +64,13 @@ def checkServerMessage():
 def updateProperty(propertyName,newValue):
     with lock:
         ns[propertyName] = newValue
+    
+def reboot():
+    lprint("reboot command received from server, rebooting...")
+    with lock:
+        time.sleep(3)
+    os.system('sudo reboot')
+
 
 
 if __name__ == '__main__':
