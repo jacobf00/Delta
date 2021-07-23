@@ -39,7 +39,7 @@ def serverMessageHandler():
             time.sleep(.1)
     except Exception as e:
         lprint("serverMessageHandler exception occured")
-        lprint(e)
+        lprint(e.with_traceback)
 
 
 
