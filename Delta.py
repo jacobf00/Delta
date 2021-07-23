@@ -274,8 +274,8 @@ class db:
             for ps in points:
                 thetas = self.reverse(ps[0],ps[1],ps[2])
                 if (
-                    thetas[0] + self.theta0[0] + self.thetaDiff < -75 or thetas[1] + self.theta0[1] + self.thetaDiff < -75 or thetas[2] + self.theta0[2] + self.thetaDiff < -75
-                    or thetas[0] + self.theta0[0] + self.thetaDiff > 75 or thetas[1] + self.theta0[1] + self.thetaDiff > 75 or thetas[2] + self.theta0[2] + self.thetaDiff > 75
+                    thetas[0] < -75 or thetas[1] < -75 or thetas[2] < -75
+                    or thetas[0] > 75 or thetas[1] > 75 or thetas[2] > 75
                     ):
                     print("Angle is out of range")
                     thetas = (0,0,0)
