@@ -12,7 +12,7 @@ class comm:
         key = file.read()
 
     crypt = Fernet(key)
-    commands = ('move','remember','kill','updateProperty','reboot')
+    #commands = ('move','remember','kill','updateProperty','reboot')
 
     def __init__(self,Inet:str,send_port:int,listen_port:int,encryption_enabled=True):
         self.inet = Inet
@@ -26,6 +26,7 @@ class comm:
         '''listens on comm's listenPort and returns the received data as a string'''
         addr = ("",self.listenPort)
         s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind(addr)
         s.listen(100)
         lprint("listening on port " + str(self.listenPort) + "...")
@@ -46,10 +47,10 @@ class comm:
                 if clientData[0] == 'kill':
                     lprint("Kill command received...shutting down comms")
                     run = False
-                if clientData[0] in comm.commands:
-                    lprint("received valid command")
-                else:
-                    lprint("received invalid command")
+                # if clientData[0] in comm.commands:
+                #     lprint("received valid command")
+                # else:
+                #     lprint("received invalid command")
                 #return clientData
             except Exception as e:
                 lprint('data could not be retrieved/decoded')
