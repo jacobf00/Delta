@@ -28,7 +28,7 @@ def serverMessageHandler():
             if clientData[0] == 'move':
                 newargs = []
                 for i in args:
-                    i = int(i)
+                    i = float(i)
                     newargs.append(i)
                 Delta1.move(*newargs)
             elif clientData[0] == 'remember':
@@ -38,7 +38,7 @@ def serverMessageHandler():
                 updatePropertyThread.start()
             time.sleep(.1)
     except Exception as e:
-        print("serverMessageHandler exception occured")
+        lprint("serverMessageHandler exception occured")
         lprint(e)
 
 
