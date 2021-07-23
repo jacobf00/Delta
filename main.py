@@ -26,6 +26,8 @@ def serverMessageHandler():
         clientData = clientData.split(sep=':')
         args = clientData[1]
         args = args.split(sep=',')
+        if clientData[0] == 'kill':
+            ns['serverMessageHandlerRunning'] = False
         if clientData[0] == 'move':
             newargs = []
             for i in args:

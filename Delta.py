@@ -7,6 +7,7 @@ import piplates.RELAYplate as RELAY
 #import csv
 import threading
 from common.servo_service import servo
+from common.tools import *
 
 #Set custom Delta exception(s)
 class SpeedError(Exception):
@@ -212,6 +213,7 @@ class db:
         self.servo1.setPosition(theta0)
         self.servo2.setPosition(theta1)
         self.servo3.setPosition(theta2)
+        lprint(f"setting servo positions to 1: {theta0}, 2: {theta1}, 3: {theta2}")
 
         #time.sleep(self.dlay)
 
