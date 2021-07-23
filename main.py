@@ -38,6 +38,7 @@ def serverMessageHandler():
                 updatePropertyThread.start()
             time.sleep(.1)
     except Exception as e:
+        print("serverMessageHandler exception occured")
         lprint(e)
 
 
