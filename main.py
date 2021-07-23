@@ -1,4 +1,5 @@
 import motion
+import os
 from Delta import db
 from points import points
 import time
@@ -28,6 +29,8 @@ def serverMessageHandler():
         args = args.split(sep=',')
         if clientData[0] == 'kill':
             ns['serverMessageHandlerRunning'] = False
+        elif clientData[0] == 'reboot':
+            os.system('sudo reboot')
         if clientData[0] == 'move':
             newargs = []
             for i in args:

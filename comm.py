@@ -12,7 +12,7 @@ class comm:
         key = file.read()
 
     crypt = Fernet(key)
-    commands = ('move','remember','kill','updateProperty')
+    commands = ('move','remember','kill','updateProperty','reboot')
 
     def __init__(self,Inet:str,send_port:int,listen_port:int,encryption_enabled=True):
         self.inet = Inet
