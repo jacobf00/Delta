@@ -216,9 +216,9 @@ class db:
         #time.sleep(self.dlay)
 
     def getCurrentAngles(self) -> tuple:
-        theta0 = self.trans(self.servo1.readCurrentPosition,toDegrees=True)
-        theta1 = self.trans(self.servo2.readCurrentPosition,toDegrees=True)
-        theta2 = self.trans(self.servo3.readCurrentPosition,toDegrees=True)
+        theta0 = self.trans(thetaIn=self.servo1.readCurrentPosition,toDegrees=True)
+        theta1 = self.trans(thetaIn=self.servo2.readCurrentPosition,toDegrees=True)
+        theta2 = self.trans(thetaIn=self.servo3.readCurrentPosition,toDegrees=True)
         return (theta0,theta1,theta2)
 
 
