@@ -34,7 +34,7 @@ def serverMessageHandler():
             elif clientData[0] == 'remember':
                 print('remember' + args)
             elif clientData[0] == 'updateProperty':
-                updatePropertyThread = threading.Thread(target=updateProperty(*args))
+                updatePropertyThread = threading.Thread(target=updateProperty,args=(args))
                 updatePropertyThread.start()
             time.sleep(.1)
     except Exception as e:
