@@ -57,31 +57,31 @@ class comm:
     def serverMessageHandler(clientMessage:str):
         '''checks for incoming server messages and handles them'''
         #try:
-        while ns['serverMessageHandlerRunning']:
-            clientData = clientMessage
-            clientData = clientData.split(sep=':')
-            args = clientData[1]
-            args = args.split(sep=',')
-            if clientData[0] == 'kill':
-                lprint("Kill command received...shutting down comms")
-                updateProperty('commRunning',False)
-                updateProperty('serverMessageHandlerRunning',False)
-            elif clientData[0] == 'reboot':
-                reboot()
-            elif clientData[0] == 'home':
-                Delta1.home()
-            elif clientData[0] == 'move':
-                newargs = []
-                for i in args:
-                    i = float(i)
-                    newargs.append(i)
-                Delta1.move(*newargs)
-            elif clientData[0] == 'remember':
-                print('remember' + args)
-            elif clientData[0] == 'updateProperty':
-                updatePropertyThread = threading.Thread(target=updateProperty,args=(args))
-                updatePropertyThread.start()
-            time.sleep(.1)
+        #while ns['serverMessageHandlerRunning']:
+        clientData = clientMessage
+        clientData = clientData.split(sep=':')
+        args = clientData[1]
+        args = args.split(sep=',')
+        if clientData[0] == 'kill':
+            lprint("Kill command received...shutting down comms")
+            updateProperty('commRunning',False)
+            updateProperty('serverMessageHandlerRunning',False)
+        elif clientData[0] == 'reboot':
+            reboot()
+        elif clientData[0] == 'home':
+            Delta1.home()
+        elif clientData[0] == 'move':
+            newargs = []
+            for i in args:
+                i = float(i)
+                newargs.append(i)
+            Delta1.move(*newargs)
+        elif clientData[0] == 'remember':
+            print('remember' + args)
+        elif clientData[0] == 'updateProperty':
+            updatePropertyThread = threading.Thread(target=updateProperty,args=(args))
+            updatePropertyThread.start()
+        time.sleep(.1)
         # except Exception as e:
         #     lprint("serverMessageHandler exception occured")
         #     lprint(e.with_traceback)
