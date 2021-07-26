@@ -117,11 +117,19 @@ class servo:
 
     @staticmethod
     def bulkWritePositions(pos1:int,pos2:int,pos3:int) -> None:
-        positions = (pos1,pos2,pos3)
+        servo.bulkWriteValues(pos1,pos2,pos3)
+
+    @staticmethod
+    def bulkWriteVelocities(v1:int,v2:int,v3:int):
+        servo.bulkWriteValues(v1,v2,v3)
+
+    @staticmethod
+    def bulkWriteValues(val1:int,val2:int,val3:int) -> None:
+        values = (val1,val2,val3)
         ids = range(1,4)
         for id in ids:
             index = id-1
-            param_goal_position = [DXL_LOBYTE(DXL_LOWORD(positions[index])), DXL_HIBYTE(DXL_LOWORD(positions[index])), DXL_LOBYTE(DXL_HIWORD(positions[index])), DXL_HIBYTE(DXL_HIWORD(positions[index]))]
+            param_goal_position = [DXL_LOBYTE(DXL_LOWORD(values[index])), DXL_HIBYTE(DXL_LOWORD(values[index])), DXL_LOBYTE(DXL_HIWORD(values[index])), DXL_HIBYTE(DXL_HIWORD(values[index]))]
 
             # Add Dynamixel#1 goal position value to the Bulkwrite parameter storage
             dxl_addparam_result = servo.groupBulkWrite.addParam(id, servo.ADDR_GOAL_POSITION, servo.LEN_GOAL_POSITION, param_goal_position)
@@ -205,7 +213,7 @@ class servo:
         elif dxl_error != 0:
             lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
         else:
-            lprint("Dynamixel torque has been successfully disabled")
+            lprint(f"Dynamixel {self.DXL_ID} torque has been successfully disabled")
 
     def setPosition(self,goalPosition):
 

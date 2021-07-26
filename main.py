@@ -29,6 +29,7 @@ if __name__ == '__main__':
     lprint("commThread started")
     commThread.join()
     lprint("Program finished...")
+    Delta1.disableTorque()
 
 
 

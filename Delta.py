@@ -19,12 +19,12 @@ class ServoAdrError(Exception):
 #construct deltabot class
 class db:
 
-    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed=12,servoAddress0=0,servoAddress1=1,servoAddress2=2):
+    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servoAddress0=0,servoAddress1=1,servoAddress2=2,servo_velocity_control=False):
         self.f = FixedBaseRadius
         self.rf = Bicep
         self.re = Forearm
         self.r = EndEffectorRadius
-
+        self.servoVelocityControl = servo_velocity_control
         #position increment in inches
         self.inc = .2 #in
         self.speed = botSpeed #in/s
@@ -271,33 +271,43 @@ class db:
 
     def move(self,x,y,z):
         #find the current position from the servo motor angles
-        origpos = self.forward(*self.getCurrentAngles())
-        newpos = (x,y,z)
-        points = self.interp(origpos,newpos)
+        origAngles = self.getCurrentAngles()
+        origPos = self.forward(*origAngles)
+        newPos = (x,y,z)
+        newAngles = self.reverse(*newPos)
+        if self.servoVelocityControl:
+            diffAngles = [newAngles[0]-origAngles[0],newAngles[1]-origAngles[1],newAngles[2]-origAngles[2]] #angle sweep needed for each servo
+            distance = dist(origPos,newPos) #distance between current and new position in inches
+            dt = distance/self.speed #idea average time between original and new point
+            angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
+            for ang in diffAngles:
+                angVelocities.append(ang/dt)
+        else:
+            points = self.interp(origPos,newPos)
 
-        #now loop through interpolated points
-        if points != None:
+            #now loop through interpolated points
+            if points != None:
 
-            for ps in points:
-                thetas = self.reverse(ps[0],ps[1],ps[2])
-                if (
-                    thetas[0] < -75 or thetas[1] < -75 or thetas[2] < -75
-                    or thetas[0] > 75 or thetas[1] > 75 or thetas[2] > 75
-                    ):
-                    print("Angle is out of range")
-                    thetas = (0,0,0)
-                    thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
-                    thread1.start()
-                    time.sleep(self.dlay)
-                    thread1.join()
-                else:
-                    try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
+                for ps in points:
+                    thetas = self.reverse(ps[0],ps[1],ps[2])
+                    if (
+                        thetas[0] < -75 or thetas[1] < -75 or thetas[2] < -75
+                        or thetas[0] > 75 or thetas[1] > 75 or thetas[2] > 75
+                        ):
+                        print("Angle is out of range")
+                        thetas = (0,0,0)
                         thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
                         thread1.start()
                         time.sleep(self.dlay)
                         thread1.join()
-                    except ValueError:
-                        print("shitty servo no go brrrrrr")
+                    else:
+                        try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
+                            thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
+                            thread1.start()
+                            time.sleep(self.dlay)
+                            thread1.join()
+                        except ValueError:
+                            print("shitty servo no go brrrrrr")
 
     #fast move method
     def fmove(self,x,y,z):
