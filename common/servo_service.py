@@ -9,6 +9,7 @@ class servo:
         self.enableTorque()
 
     def setId(self,dxl_id:int):
+        self.setControlTableValue(servo.ADDR_ID,dxl_id)
         self.DXL_ID = dxl_id
 
     def reboot(self):
@@ -112,10 +113,6 @@ class servo:
 
     def setGoalVelocity(self,velocity:int):
         self.setControlTableValue(servo.ADDR_GOAL_VELOCITY,velocity)
-
-    def setId(self,newId:int):
-        self.setControlTableValue(servo.ADDR_ID,newId)
-        self.setId(newId)
 
     def readCurrentPosition(self) -> int:
         return self.readControlTableValue(servo.ADDR_PRESENT_POSITION)

@@ -4,6 +4,7 @@ import threading
 import multiprocessing
 from cryptography.fernet import Fernet
 from common.tools import *
+from common.init import *
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection'''
@@ -30,8 +31,7 @@ class comm:
         s.bind(addr)
         s.listen(100)
         lprint("listening on port " + str(self.listenPort) + "...")
-        run = True
-        while(run):
+        while ns['commRunning']:
             try:
                 c,ServerAdr = s.accept()
                 lprint("Connection established, receiving data...")
@@ -41,12 +41,7 @@ class comm:
                 else:
                     clientData = clientData.decode('UTF-8')
                 lprint("received " + clientData + " from " + str(ServerAdr))
-                with lock:
-                    self.currentServerMessage = clientData
-                clientData = clientData.split(sep=':')
-                if clientData[0] == 'kill':
-                    lprint("Kill command received...shutting down comms")
-                    run = False
+                threading.Thread(target=comm.serverMessageHandler,args=(clientData,)).start()
                 # if clientData[0] in comm.commands:
                 #     lprint("received valid command")
                 # else:
@@ -58,6 +53,39 @@ class comm:
                 return 'error'
             finally:
                 c.close()
+
+        
+    def serverMessageHandler(clientMessage:str):
+        '''checks for incoming server messages and handles them'''
+        #try:
+        while ns['serverMessageHandlerRunning']:
+            clientData = clientMessage
+            clientData = clientData.split(sep=':')
+            args = clientData[1]
+            args = args.split(sep=',')
+            if clientData[0] == 'kill':
+                lprint("Kill command received...shutting down comms")
+                updateProperty('commRunning',False)
+                updateProperty('serverMessageHandlerRunning',False)
+            elif clientData[0] == 'reboot':
+                reboot()
+            elif clientData[0] == 'home':
+                Delta1.home()
+            elif clientData[0] == 'move':
+                newargs = []
+                for i in args:
+                    i = float(i)
+                    newargs.append(i)
+                Delta1.move(*newargs)
+            elif clientData[0] == 'remember':
+                print('remember' + args)
+            elif clientData[0] == 'updateProperty':
+                updatePropertyThread = threading.Thread(target=updateProperty,args=(args))
+                updatePropertyThread.start()
+            time.sleep(.1)
+        # except Exception as e:
+        #     lprint("serverMessageHandler exception occured")
+        #     lprint(e.with_traceback)
 
 
 
