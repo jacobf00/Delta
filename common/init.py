@@ -1,14 +1,14 @@
 from Delta import db
 from points import points
-from common.tools import *
-from comm import comm
 import os
 import time
+from common.lock_print import *
 
 '''contains initialized objects vital for the program along with general methods used by program'''
 
 
-def updateProperty(propertyName,newValue):
+
+def updateProperty(propertyName:str,newValue):
     lprint("updating property: " + propertyName + " to: " + str(newValue))
     with lock:
         ns[propertyName] = newValue
@@ -19,6 +19,7 @@ def reboot():
         time.sleep(3)
     os.system('sudo reboot')
 
+
 ns = {}
 
 ns['serverAdr'] = '10.6.1.26'
@@ -27,7 +28,6 @@ ns['listenPort'] = 5002
 ns['serverMessageHandlerRunning'] = True
 ns['commRunning'] = True
 
-com = comm(Inet=ns['serverAdr'],send_port=ns['serverPort'],listen_port=ns['listenPort'])
 
 
 f = 6.25 #fixed base radius (in)

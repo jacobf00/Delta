@@ -1,8 +1,9 @@
 import motion
 import time
 import multiprocessing
-from common.tools import *
 from common.init import *
+from comm import comm
+
 
 
 #manager = multiprocessing.Manager()
@@ -22,6 +23,7 @@ from common.init import *
 
 
 if __name__ == '__main__':
+    com = comm(Inet=ns['serverAdr'],send_port=ns['serverPort'],listen_port=ns['listenPort'])
     commThread = threading.Thread(target=com.listen)
     commThread.start()
     lprint("commThread started")

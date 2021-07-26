@@ -7,7 +7,7 @@ import piplates.RELAYplate as RELAY
 #import csv
 import threading
 from common.servo_service import servo
-from common.tools import *
+from common.lock_print import *
 
 #Set custom Delta exception(s)
 class SpeedError(Exception):
@@ -210,17 +210,22 @@ class db:
         theta0 = round(self.trans(-thetas[0] + self.theta0[0] + self.thetaDiff,0))
         theta1 = round(self.trans(-thetas[1] + self.theta0[1] + self.thetaDiff,1))
         theta2 = round(self.trans(-thetas[2] + self.theta0[2] + self.thetaDiff,2))
-        self.servo1.setPosition(theta0)
-        self.servo2.setPosition(theta1)
-        self.servo3.setPosition(theta2)
+        # self.servo1.setPosition(theta0)
+        # self.servo2.setPosition(theta1)
+        # self.servo3.setPosition(theta2)
+        servo.bulkWritePositions(theta0,theta1,theta2)
         lprint(f"setting servo positions to 1: {thetas[0]}, 2: {thetas[1]}, 3: {thetas[2]}")
 
         #time.sleep(self.dlay)
 
     def getCurrentAngles(self) -> tuple:
-        theta0 = self.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
-        theta1 = self.trans(thetaIn=self.servo2.readCurrentPosition(),toDegrees=True)
-        theta2 = self.trans(thetaIn=self.servo3.readCurrentPosition(),toDegrees=True)
+        # theta0 = self.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
+        # theta1 = self.trans(thetaIn=self.servo2.readCurrentPosition(),toDegrees=True)
+        # theta2 = self.trans(thetaIn=self.servo3.readCurrentPosition(),toDegrees=True)
+        theta0,theta1,theta2 = servo.syncReadPositions()
+        theta0 = self.trans(theta0,toDegrees=True)
+        theta1 = self.trans(theta1,toDegrees=True)
+        theta2 = self.trans(theta2,toDegrees=True)
         return (theta0,theta1,theta2)
 
 

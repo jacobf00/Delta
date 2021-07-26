@@ -1,6 +1,5 @@
 from dynamixel_sdk import * # Uses Dynamixel SDK library
-from common.tools import *
-
+from common.lock_print import *
 class servo:
 
     def __init__(self,Dynamixel_ID:int) -> None:
@@ -9,7 +8,7 @@ class servo:
         self.enableTorque()
 
     def setId(self,dxl_id:int):
-        self.setControlTableValue(servo.ADDR_ID,dxl_id)
+        self.setControlTableValue1Byte(servo.ADDR_ID,dxl_id)
         self.DXL_ID = dxl_id
 
     def reboot(self):
@@ -42,6 +41,8 @@ class servo:
         ADDR_GOAL_POSITION          = 116
         ADDR_PRESENT_POSITION       = 132
         ADDR_GOAL_VELOCITY          = 104
+        LEN_GOAL_POSITION           = 4         # Data Byte Length
+        LEN_PRESENT_POSITION        = 4         # Data Byte Length
         ADDR_ID                     = 7
         DXL_MINIMUM_POSITION_VALUE  = 0         # Refer to the Minimum Position Limit of product eManual
         DXL_MAXIMUM_POSITION_VALUE  = 4095      # Refer to the Maximum Position Limit of product eManual
@@ -111,15 +112,63 @@ class servo:
         lprint("Press any key to terminate...")
         quit()
 
+    syncReader = GroupSyncRead(port=portHandler,ph=packetHandler,start_address=ADDR_PRESENT_POSITION,data_length=LEN_PRESENT_POSITION)
+    groupBulkWrite = GroupBulkWrite(portHandler, packetHandler)
+
+    @staticmethod
+    def bulkWritePositions(pos1:int,pos2:int,pos3:int) -> None:
+        positions = (pos1,pos2,pos3)
+        ids = range(1,4)
+        for id in ids:
+            index = id-1
+            param_goal_position = [DXL_LOBYTE(DXL_LOWORD(positions[index])), DXL_HIBYTE(DXL_LOWORD(positions[index])), DXL_LOBYTE(DXL_HIWORD(positions[index])), DXL_HIBYTE(DXL_HIWORD(positions[index]))]
+
+            # Add Dynamixel#1 goal position value to the Bulkwrite parameter storage
+            dxl_addparam_result = servo.groupBulkWrite.addParam(id, servo.ADDR_GOAL_POSITION, servo.LEN_GOAL_POSITION, param_goal_position)
+            if dxl_addparam_result != True:
+                print("[ID:%03d] groupBulkWrite addparam failed" % id)
+                quit()
+        # Bulkwrite goal positions
+        dxl_comm_result = servo.groupBulkWrite.txPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+        servo.groupBulkWrite.clearParam()
+
+    @staticmethod
+    def syncReadPositions(servoIdStart:int=1,servoIdEnd:int=3):
+        ids = range(servoIdStart,servoIdEnd+1)
+        for id in ids:
+            isProtocol2 = servo.syncReader.addParam(id)
+            if not isProtocol2:
+                lprint(f"DXL Id {id} could not be added to syndRead")
+                return None
+        servo.syncReader.txRxPacket()
+        pos1 = servo.syncReader.getData(ids[0],servo.ADDR_PRESENT_POSITION,servo.LEN_PRESENT_POSITION)
+        pos2 = servo.syncReader.getData(ids[1],servo.ADDR_PRESENT_POSITION,servo.LEN_PRESENT_POSITION)
+        pos3 = servo.syncReader.getData(ids[2],servo.ADDR_PRESENT_POSITION,servo.LEN_PRESENT_POSITION)
+        servo.syncReader.clearParam()
+        return (pos1,pos2,pos3)
+
+
+
     def setGoalVelocity(self,velocity:int):
-        self.setControlTableValue(servo.ADDR_GOAL_VELOCITY,velocity)
+        self.setControlTableValue4Byte(servo.ADDR_GOAL_VELOCITY,velocity)
 
     def readCurrentPosition(self) -> int:
         return self.readControlTableValue(servo.ADDR_PRESENT_POSITION)
 
 
-    def setControlTableValue(self,address:int,value:int): 
+    def setControlTableValue1Byte(self,address:int,value:int): 
         dxl_comm_result, dxl_error = servo.packetHandler.write1ByteTxRx(servo.portHandler, self.DXL_ID, address, value)
+        if dxl_comm_result != COMM_SUCCESS:
+            lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+        elif dxl_error != 0:
+            lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+        else:
+            lprint("Control table value changed successfully")
+
+    def setControlTableValue4Byte(self,address:int,value:int): 
+        dxl_comm_result, dxl_error = servo.packetHandler.write4ByteTxRx(servo.portHandler, self.DXL_ID, address, value)
         if dxl_comm_result != COMM_SUCCESS:
             lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
         elif dxl_error != 0:
@@ -156,7 +205,7 @@ class servo:
         elif dxl_error != 0:
             lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
         else:
-            lprint("Dynamixel torque has been successfully diabled")
+            lprint("Dynamixel torque has been successfully disabled")
 
     def setPosition(self,goalPosition):
 

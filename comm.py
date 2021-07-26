@@ -3,7 +3,6 @@ import socket
 import threading
 import multiprocessing
 from cryptography.fernet import Fernet
-from common.tools import *
 from common.init import *
 
 class comm:
