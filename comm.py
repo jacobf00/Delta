@@ -65,7 +65,6 @@ class comm:
         if clientData[0] == 'kill':
             lprint("Kill command received...shutting down comms")
             updateProperty('commRunning',False)
-            updateProperty('serverMessageHandlerRunning',False)
         elif clientData[0] == 'reboot':
             reboot()
         elif clientData[0] == 'home':
@@ -79,8 +78,7 @@ class comm:
         elif clientData[0] == 'remember':
             print('remember' + args)
         elif clientData[0] == 'updateProperty':
-            updatePropertyThread = threading.Thread(target=updateProperty,args=(args))
-            updatePropertyThread.start()
+            updateProperty(*args)
         time.sleep(.1)
         # except Exception as e:
         #     lprint("serverMessageHandler exception occured")
