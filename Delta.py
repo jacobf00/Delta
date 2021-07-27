@@ -216,7 +216,7 @@ class db:
         vel2 = abs(round(db.velTrans(velocities[1])))
         vel3 = abs(round(db.velTrans(velocities[2])))
         servo.bulkWriteVelocities(vel1,vel2,vel3)
-        lprint(f"setting servo goal velocities to 1: {velocities[0]}, 2: {velocities[1]}, 3: {velocities[2]} deg/sec")
+        lprint(f"setting servo goal velocities to 1: {round(velocities[0],2)}, 2: {round(velocities[1],2)}, 3: {round(velocities[2],2)} deg/sec")
         lprint(f"setting servo goal velocities to 1: {vel1}, 2: {vel2}, 3: {vel3} pulse")
 
 
@@ -228,7 +228,7 @@ class db:
         # self.servo2.setPosition(theta1)
         # self.servo3.setPosition(theta2)
         servo.bulkWritePositions(theta0,theta1,theta2)
-        lprint(f"setting servo positions to 1: {thetas[0]}, 2: {thetas[1]}, 3: {thetas[2]} deg")
+        lprint(f"setting servo positions to 1: {round(thetas[0],2)}, 2: {round(thetas[1],2)}, 3: {round(thetas[2],2)} deg")
 
         #time.sleep(self.dlay)
 
