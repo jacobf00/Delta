@@ -212,9 +212,9 @@ class db:
         return (x0,y0,z0)
 
     def setVelocities(self,velocities:list):
-        vel1 = round(db.velTrans(velocities[0]))
-        vel2 = round(db.velTrans(velocities[1]))
-        vel3 = round(db.velTrans(velocities[2]))
+        vel1 = abs(round(db.velTrans(velocities[0])))
+        vel2 = abs(round(db.velTrans(velocities[1])))
+        vel3 = abs(round(db.velTrans(velocities[2])))
         servo.bulkWriteVelocities(vel1,vel2,vel3)
         lprint(f"setting servo goal velocities to 1: {velocities[0]}, 2: {velocities[1]}, 3: {velocities[2]} deg/sec")
         lprint(f"setting servo goal velocities to 1: {vel1}, 2: {vel2}, 3: {vel3} pulse")

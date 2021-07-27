@@ -40,7 +40,7 @@ class servo:
         ADDR_TORQUE_ENABLE          = 64
         ADDR_GOAL_POSITION          = 116
         ADDR_PRESENT_POSITION       = 132
-        ADDR_GOAL_VELOCITY          = 104
+        ADDR_PROFILE_VELOCITY          = 112
         LEN_GOAL_POSITION           = 4         # Data Byte Length
         LEN_PRESENT_POSITION        = 4         # Data Byte Length
         ADDR_ID                     = 7
@@ -124,7 +124,7 @@ class servo:
         servo.bulkWriteValues(pos1,pos2,pos3,address=address)
 
     @staticmethod
-    def bulkWriteVelocities(v1:int,v2:int,v3:int,address=ADDR_GOAL_VELOCITY):
+    def bulkWriteVelocities(v1:int,v2:int,v3:int,address=ADDR_PROFILE_VELOCITY):
         servo.bulkWriteValues(v1,v2,v3,address=address)
 
     @staticmethod
@@ -164,7 +164,7 @@ class servo:
 
 
     def setGoalVelocity(self,velocity:int):
-        self.setControlTableValue4Byte(servo.ADDR_GOAL_VELOCITY,velocity)
+        self.setControlTableValue4Byte(servo.ADDR_PROFILE_VELOCITY,velocity)
 
     def readCurrentPosition(self) -> int:
         return self.readControlTableValue(servo.ADDR_PRESENT_POSITION)

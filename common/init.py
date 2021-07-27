@@ -35,7 +35,7 @@ f = 6.25 #fixed base radius (in)
 rf = 7.98 #Bicep length (in)
 re = 25 #Forearm length (in)
 r = 2.3125  #end effector radius (in)
-speed = 24 #bot speed (in/s)
+speed = 5 #bot speed (in/s)
 
 Delta1 = db(f,rf,re,r,botSpeed=speed,servo_velocity_control=True)
 
