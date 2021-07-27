@@ -217,6 +217,8 @@ class db:
         vel3 = round(db.velTrans(velocities[2]))
         servo.bulkWriteVelocities(vel1,vel2,vel3)
         lprint(f"setting servo goal velocities to 1: {velocities[0]}, 2: {velocities[1]}, 3: {velocities[2]} deg/sec")
+        lprint(f"setting servo goal velocities to 1: {vel1}, 2: {vel2}, 3: {vel3} pulse")
+
 
     def setAngles(self,thetas:tuple):
         theta0 = round(self.trans(-thetas[0] + self.theta0[0] + self.thetaDiff,0))
@@ -298,14 +300,25 @@ class db:
             angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
             for ang in diffAngles:
                 angVelocities.append(ang/dt)
-            t1 = threading.Thread(target=self.setAnglesAndVelocities,args=(newAngles,angVelocities))
-            t1.start()
-            time.sleep(dt)
-            if t1.is_alive():
-                lprint("servos have not moved in ideal time")
-            t1.join()
-            # self.setVelocities(angVelocities)
-            # self.setAngles(newAngles)       
+            if (
+                newAngles[0] < -90 or newAngles[1] < -90 or newAngles[2] < -90
+                or newAngles[0] > 90 or newAngles[1] > 90 or newAngles[2] > 90
+                ):
+                print("Angle is out of range")
+                thetas = (0,0,0)
+                thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
+                thread1.start()
+                time.sleep(self.dlay)
+                thread1.join()
+            else:
+                t1 = threading.Thread(target=self.setAnglesAndVelocities,args=(newAngles,angVelocities))
+                t1.start()
+                time.sleep(dt)
+                if t1.is_alive():
+                    lprint("servos have not moved in ideal time")
+                t1.join()
+                # self.setVelocities(angVelocities)
+                # self.setAngles(newAngles)       
         else:
             points = self.interp(origPos,newPos)
 
