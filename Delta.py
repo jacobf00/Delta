@@ -19,7 +19,7 @@ class ServoAdrError(Exception):
 #construct deltabot class
 class db:
 
-    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servoAddress0=0,servoAddress1=1,servoAddress2=2,servo_velocity_control=False):
+    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servoAddress0=0,servoAddress1=1,servoAddress2=2,servo_velocity_control=True):
         self.f = FixedBaseRadius
         self.rf = Bicep
         self.re = Forearm

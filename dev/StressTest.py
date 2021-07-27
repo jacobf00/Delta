@@ -14,19 +14,21 @@ Delta1 = db(f,rf,re,r,botSpeed=speed)
 
 def moveServo(deg):
 
-    Delta1.setAngles(deg)
+    thetas = (deg,deg,deg)
+
+    Delta1.setAngles(thetas)
 
     
 seconds = 0
 upTime = 5 #minutes
 downTime = 3 #minutes
 while 1:
-    thread1 = threading.Thread(target=moveServo(180))
+    thread1 = threading.Thread(target=moveServo,args=(-90,))
     thread1.start()
     time.sleep(1)
     thread1.join()
 
-    thread2 = threading.Thread(target=moveServo(0))
+    thread2 = threading.Thread(target=moveServo,args=(90,))
     thread2.start()
     time.sleep(1)
     thread2.join()
