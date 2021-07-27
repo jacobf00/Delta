@@ -46,6 +46,7 @@ class comm:
                 # else:
                 #     lprint("received invalid command")
                 #return clientData
+                time.sleep(.1)
             except Exception as e:
                 lprint('data could not be retrieved/decoded')
                 lprint(e)
