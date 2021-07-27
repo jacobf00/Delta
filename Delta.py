@@ -293,7 +293,7 @@ class db:
         newAngles = self.reverse(*newPos)
         if self.servoVelocityControl:
             diffAngles = [newAngles[0]-origAngles[0],newAngles[1]-origAngles[1],newAngles[2]-origAngles[2]] #angle sweep needed for each servo
-            distance = dist(origPos,newPos) #distance between current and new position in inches
+            distance = self.dist(origPos,newPos) #distance between current and new position in inches
             dt = distance/self.speed #ideal average time between original and new point
             angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
             for ang in diffAngles:
