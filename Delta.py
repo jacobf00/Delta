@@ -1,5 +1,5 @@
 #author: Jacob Foulds
-from math import *
+import math
 import numpy as np
 import time
 import piplates.RELAYplate as RELAY
@@ -132,12 +132,12 @@ class db:
         if d < 0:
             raise Exception("Point is outside of bot's reach")
 
-        yj = (y1 - a*b - sqrt(d))/(b*b + 1)
+        yj = (y1 - a*b - math.sqrt(d))/(b*b + 1)
         zj = a + b*yj
         #Now calculate theta from these values
         #In this case, theta is defined as the angle clockwise from the horizontal
 
-        theta = (180/pi)*atan(-zj/(y1-yj)) #calculates theta in degrees
+        theta = (180/math.pi)*math.atan(-zj/(y1-yj)) #calculates theta in degrees
         if yj>y1:
             theta += 180.0
         return theta
@@ -145,7 +145,7 @@ class db:
     def reverse(self,x0,y0,z0):
         '''Takes x,y,z coordinates and calculates the corresponding theta values for the servo motors.
         returns (0,0,0) if point is not within reach.'''
-        sin120 = sqrt(3)/2
+        sin120 = math.sqrt(3)/2
         cos120 = -1/2 #also equals cos(-120)
         try:
             theta1 = self.calcAngleYZ(x0,y0,z0)
@@ -164,21 +164,21 @@ class db:
         
         t = self.f-self.r
 
-        theta1, theta2, theta3 = radians(theta1), radians(theta2), radians(theta3)
+        theta1, theta2, theta3 = math.radians(theta1), math.radians(theta2), math.radians(theta3)
 
         # Calculate position of leg1's joint.  x1 is implicitly zero - along the axis
-        y1 = -(t + self.rf*cos(theta1))
-        z1 = -self.rf*sin(theta1)
+        y1 = -(t + self.rf*math.cos(theta1))
+        z1 = -self.rf*math.sin(theta1)
 
         # Calculate leg2's joint position
-        y2 = (t + self.rf*cos(theta2))*sin(pi/6)
-        x2 = y2*tan(pi/3)
-        z2 = -self.rf*sin(theta2)
+        y2 = (t + self.rf*math.cos(theta2))*math.sin(math.pi/6)
+        x2 = y2*math.tan(math.pi/3)
+        z2 = -self.rf*math.sin(theta2)
 
         # Calculate leg3's joint position
-        y3 = (t + self.rf*cos(theta3))*sin(pi/6)
-        x3 = -y3*tan(pi/3)
-        z3 = -self.rf*sin(theta3)
+        y3 = (t + self.rf*math.cos(theta3))*math.sin(math.pi/6)
+        x3 = -y3*math.tan(math.pi/3)
+        z3 = -self.rf*math.sin(theta3)
 
         # From the three positions in space, determine if there is a valid
         # location for the effector
@@ -206,7 +206,7 @@ class db:
         if d < 0:
             return None # non-existing point
 
-        z0 = -0.5*(b+sqrt(d))/a
+        z0 = -0.5*(b+math.sqrt(d))/a
         x0 = (a1*z0 + b1)/dnm
         y0 = (a2*z0 + b2)/dnm
         return (x0,y0,z0)
@@ -249,7 +249,7 @@ class db:
 
 
     def dist(self,point1,point2):
-        distance = sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2 + (point1[2]-point2[2])**2)
+        distance = math.sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2 + (point1[2]-point2[2])**2)
         return distance
 
     def interp(self,point1,point2):
@@ -296,7 +296,7 @@ class db:
         if self.servoVelocityControl:
             diffAngles = [newAngles[0]-origAngles[0],newAngles[1]-origAngles[1],newAngles[2]-origAngles[2]] #angle sweep needed for each servo
             distance = self.dist(origPos,newPos) #distance between current and new position in inches
-            dt = distance/self.speed #ideal average time between original and new point
+            dt = distance/self.speed #ideal time between original and new point
             angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
             for ang in diffAngles:
                 angVelocities.append(ang/dt)
