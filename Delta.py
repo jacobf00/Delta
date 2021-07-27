@@ -231,8 +231,8 @@ class db:
         #time.sleep(self.dlay)
 
     def setAnglesAndVelocities(self,thetas,velocities):
-        self.setAngles(thetas)
         self.setVelocities(velocities)
+        self.setAngles(thetas)
 
     def getCurrentAngles(self) -> tuple:
         # theta0 = self.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
