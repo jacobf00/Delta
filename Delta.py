@@ -103,6 +103,11 @@ class db:
             thetaOut = slope*thetaIn + realServoMin
             return thetaOut
 
+    def velTrans(x,y1=servo.DXL_MAXIMUM_VELOCITY_VALUE,y0=servo.DXL_MINIMUM_VELOCITY_VALUE,x1=servo.DXL_MAXIMUM_VELOCITY_VALUE_DEG,x0=servo.DXL_MINIMUM_VELOCITY_VALUE_DEG):
+        slope = (y1-y0)/(x1-x0)
+        y = slope*(x-x0) + y0
+        return y
+
 
     def drop(self,seconds = .5):
         if seconds is None:
@@ -206,6 +211,13 @@ class db:
         y0 = (a2*z0 + b2)/dnm
         return (x0,y0,z0)
 
+    def setVelocities(self,velocities:list):
+        vel1 = round(db.velTrans(velocities[0]))
+        vel2 = round(db.velTrans(velocities[1]))
+        vel3 = round(db.velTrans(velocities[2]))
+        servo.bulkWriteVelocities(vel1,vel2,vel3)
+        lprint(f"setting servo goal velocities to 1: {velocities[0]}, 2: {velocities[1]}, 3: {velocities[2]} deg/sec")
+
     def setAngles(self,thetas:tuple):
         theta0 = round(self.trans(-thetas[0] + self.theta0[0] + self.thetaDiff,0))
         theta1 = round(self.trans(-thetas[1] + self.theta0[1] + self.thetaDiff,1))
@@ -214,9 +226,13 @@ class db:
         # self.servo2.setPosition(theta1)
         # self.servo3.setPosition(theta2)
         servo.bulkWritePositions(theta0,theta1,theta2)
-        lprint(f"setting servo positions to 1: {thetas[0]}, 2: {thetas[1]}, 3: {thetas[2]}")
+        lprint(f"setting servo positions to 1: {thetas[0]}, 2: {thetas[1]}, 3: {thetas[2]} deg")
 
         #time.sleep(self.dlay)
+
+    def setAnglesAndVelocities(self,thetas,velocities):
+        self.setAngles(thetas)
+        self.setVelocities(velocities)
 
     def getCurrentAngles(self) -> tuple:
         # theta0 = self.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
@@ -278,10 +294,18 @@ class db:
         if self.servoVelocityControl:
             diffAngles = [newAngles[0]-origAngles[0],newAngles[1]-origAngles[1],newAngles[2]-origAngles[2]] #angle sweep needed for each servo
             distance = dist(origPos,newPos) #distance between current and new position in inches
-            dt = distance/self.speed #idea average time between original and new point
+            dt = distance/self.speed #ideal average time between original and new point
             angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
             for ang in diffAngles:
                 angVelocities.append(ang/dt)
+            t1 = threading.Thread(target=self.setAnglesAndVelocities,args=(newAngles,angVelocities))
+            t1.start()
+            time.sleep(dt)
+            if t1.is_alive():
+                lprint("servos have not moved in ideal time")
+            t1.join()
+            # self.setVelocities(angVelocities)
+            # self.setAngles(newAngles)       
         else:
             points = self.interp(origPos,newPos)
 

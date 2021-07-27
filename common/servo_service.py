@@ -46,6 +46,10 @@ class servo:
         ADDR_ID                     = 7
         DXL_MINIMUM_POSITION_VALUE  = 0         # Refer to the Minimum Position Limit of product eManual
         DXL_MAXIMUM_POSITION_VALUE  = 4095      # Refer to the Maximum Position Limit of product eManual
+        DXL_MINIMUM_VELOCITY_VALUE  = -1023
+        DXL_MAXIMUM_VELOCITY_VALUE  = 1023
+        DXL_MINIMUM_VELOCITY_VALUE_DEG  = -1405.6
+        DXL_MAXIMUM_VELOCITY_VALUE_DEG  = 1405.6
         BAUDRATE                    = 57600
     elif MY_DXL == 'PRO_SERIES':
         ADDR_TORQUE_ENABLE          = 562       # Control table address is different in DYNAMIXEL model
@@ -116,15 +120,15 @@ class servo:
     groupBulkWrite = GroupBulkWrite(portHandler, packetHandler)
 
     @staticmethod
-    def bulkWritePositions(pos1:int,pos2:int,pos3:int) -> None:
-        servo.bulkWriteValues(pos1,pos2,pos3)
+    def bulkWritePositions(pos1:int,pos2:int,pos3:int,address=ADDR_GOAL_POSITION) -> None:
+        servo.bulkWriteValues(pos1,pos2,pos3,address=address)
 
     @staticmethod
-    def bulkWriteVelocities(v1:int,v2:int,v3:int):
-        servo.bulkWriteValues(v1,v2,v3)
+    def bulkWriteVelocities(v1:int,v2:int,v3:int,address=ADDR_GOAL_VELOCITY):
+        servo.bulkWriteValues(v1,v2,v3,address=address)
 
     @staticmethod
-    def bulkWriteValues(val1:int,val2:int,val3:int) -> None:
+    def bulkWriteValues(val1:int,val2:int,val3:int,address:int) -> None:
         values = (val1,val2,val3)
         ids = range(1,4)
         for id in ids:
@@ -132,7 +136,7 @@ class servo:
             param_goal_position = [DXL_LOBYTE(DXL_LOWORD(values[index])), DXL_HIBYTE(DXL_LOWORD(values[index])), DXL_LOBYTE(DXL_HIWORD(values[index])), DXL_HIBYTE(DXL_HIWORD(values[index]))]
 
             # Add Dynamixel#1 goal position value to the Bulkwrite parameter storage
-            dxl_addparam_result = servo.groupBulkWrite.addParam(id, servo.ADDR_GOAL_POSITION, servo.LEN_GOAL_POSITION, param_goal_position)
+            dxl_addparam_result = servo.groupBulkWrite.addParam(id, address, servo.LEN_GOAL_POSITION, param_goal_position)
             if dxl_addparam_result != True:
                 print("[ID:%03d] groupBulkWrite addparam failed" % id)
                 quit()

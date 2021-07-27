@@ -94,4 +94,8 @@ nums = [3,2,1]
 def numPrint(num1,num2,num3):
     print(num1 + num2 + num3)
 
-numPrint(*nums)
+for num in nums:
+    num = num + 1
+    print(num)
+
+print(nums)

@@ -23,7 +23,7 @@ class comm:
         self.currentServerMessage = ""
 
     def listen(self):
-        '''listens on comm's listenPort and returns the received data as a string'''
+        '''listens on comm's listenPort and passes the received data to the message handler'''
         addr = ("",self.listenPort)
         s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -35,7 +35,7 @@ class comm:
                 c,ServerAdr = s.accept()
                 lprint("Connection established, receiving data...")
                 clientData = c.recv(1024)
-                if self.encrytionEnabled:
+                if ns['encryptionEnabled']:
                     clientData = comm.crypt.decrypt(clientData).decode('UTF-8')
                 else:
                     clientData = clientData.decode('UTF-8')
@@ -55,7 +55,7 @@ class comm:
 
         
     def serverMessageHandler(clientMessage:str):
-        '''checks for incoming server messages and handles them'''
+        '''handles incoming server messages'''
         #try:
         #while ns['serverMessageHandlerRunning']:
         clientData = clientMessage

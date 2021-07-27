@@ -27,6 +27,7 @@ ns['serverPort'] = 5001
 ns['listenPort'] = 5002
 ns['serverMessageHandlerRunning'] = True
 ns['commRunning'] = True
+ns['encryptionEnabled'] = True
 
 
 
@@ -36,7 +37,7 @@ re = 25 #Forearm length (in)
 r = 2.3125  #end effector radius (in)
 speed = 24 #bot speed (in/s)
 
-Delta1 = db(f,rf,re,r,botSpeed=speed)
+Delta1 = db(f,rf,re,r,botSpeed=speed,servo_velocity_control=True)
 
 length = 18
 width = 15
