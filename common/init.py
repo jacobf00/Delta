@@ -8,18 +8,6 @@ from common.lock_print import *
 
 
 
-def updateProperty(propertyName:str,newValue):
-    lprint("updating property: " + propertyName + " to: " + str(newValue))
-    with lock:
-        ns[propertyName] = newValue
-
-def reboot():
-    lprint("reboot command received from server, rebooting...")
-    with lock:
-        time.sleep(3)
-    os.system('sudo reboot')
-
-
 ns = {}
 
 ns['serverAdr'] = '10.6.1.26'

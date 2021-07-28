@@ -246,6 +246,11 @@ class db:
         theta2 = self.trans(theta2,toDegrees=True)
         return (theta0,theta1,theta2)
 
+    def getCurrentPosition(self):
+        currentAngles = self.getCurrentAngles()
+        currentPosition = self.forward(*currentAngles)
+        return currentPosition
+
 
 
     def dist(self,point1,point2):
