@@ -2,7 +2,7 @@ import time
 import csv
 import numpy as np
 import threading
-from Delta import db
+from common.Delta import db
 
 f = 6.25 #fixed base radius (in)
 rf = 7.98 #Bicep length (in)

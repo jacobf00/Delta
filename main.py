@@ -1,8 +1,8 @@
-import motion
+import common.motion
 import time
 import multiprocessing
 from common.init import *
-from comm import comm
+from common.comm import comm
 
 
 
