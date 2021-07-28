@@ -1,6 +1,6 @@
 from common.Delta import db
 import time
-from points import points
+from common.points import points
 #from adafruit_servokit import ServoKit
 
 
