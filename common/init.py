@@ -1,5 +1,5 @@
-from Delta import db
-from points import points
+from common.Delta import db
+from common.points import points
 import os
 import time
 from common.lock_print import *
