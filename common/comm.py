@@ -3,8 +3,7 @@ import socket
 import threading
 import multiprocessing
 from cryptography.fernet import Fernet
-from common.init import *
-import queue
+from common.config import *
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection.
@@ -16,13 +15,14 @@ class comm:
     crypt = Fernet(key)
     #commands = ('move','remember','kill','updateProperty','reboot')
 
-    def __init__(self,Inet:str,send_port:int,listen_port:int,encryption_enabled=True):
+    def __init__(self,Inet:str,send_port:int,listen_port:int,delta,encryption_enabled=True):
         self.inet = Inet
         self.sendPort = send_port
         self.listenPort = listen_port
         self.encrytionEnabled = encryption_enabled
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.currentServerMessage = ""
+        self.Delta1 = delta
 
     def listen(self):
         '''listens on comm's listenPort and passes the received data to the message handler'''
@@ -63,7 +63,7 @@ class comm:
                 c.close()
 
         
-    def serverMessageHandler(clientMessage:str):
+    def serverMessageHandler(self,clientMessage:str):
         '''handles incoming server messages'''
         #try:
         #while ns['serverMessageHandlerRunning']:
@@ -80,16 +80,16 @@ class comm:
         elif clientData[0] == 'hello':
             toSend = 'hello'
         elif clientData[0] == 'home':
-            threading.Thread(target=Delta1.home).start()
+            threading.Thread(target=self.Delta1.home).start()
         elif clientData[0] == 'move':
             newargs = []
             for i in args:
                 newargs.append(float(i))
-            threading.Thread(target=Delta1.move,args=(newargs)).start()
+            threading.Thread(target=self.Delta1.move,args=(newargs)).start()
         elif clientData[0] == 'remember':
             toSend = 'remember:'
             translationTable = dict.fromkeys(map(ord,'() '),None)
-            currentPosition = str(Delta1.getCurrentPosition())
+            currentPosition = str(self.Delta1.getCurrentPosition())
             currentPosition = currentPosition.translate(translationTable)
             toSend += currentPosition
         elif clientData[0] == 'updateProperty':

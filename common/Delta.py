@@ -19,7 +19,7 @@ class ServoAdrError(Exception):
 #construct deltabot class
 class db:
 
-    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servoAddress0=0,servoAddress1=1,servoAddress2=2,servo_velocity_control=True):
+    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servo_velocity_control=True):
         self.f = FixedBaseRadius
         self.rf = Bicep
         self.re = Forearm
@@ -38,10 +38,20 @@ class db:
         self.createServos()
 
     def createServos(self):
-        self.servo1 = servo(Dynamixel_ID=1)
-        self.servo2 = servo(Dynamixel_ID=2)
-        self.servo3 = servo(Dynamixel_ID=3)
-
+        try:
+            self.servo1 = servo(Dynamixel_ID=1)
+        except:
+            print("servo 1 could not be connected successfully")
+        try:
+            self.servo2 = servo(Dynamixel_ID=2)
+        except:
+            print("servo 2 could not be connected successfully")
+        try:
+            self.servo3 = servo(Dynamixel_ID=3)
+        except:
+            print("servo 3 could not be connected successfully")
+            
+            
     def updateServoRange(self):
         #list is ordered servos 0-2 on indices 0-2
         self.minServos = []
@@ -351,8 +361,9 @@ class db:
                         except ValueError:
                             print("shitty servo no go brrrrrr")
 
-    #fast move method
+
     def fmove(self,x,y,z):
+        '''method for moving the servos to point instantly (fast move)'''
         thetas = self.reverse(x,y,z)
         try:
             self.setAngles(thetas)

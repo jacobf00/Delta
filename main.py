@@ -1,7 +1,9 @@
 import common.motion
 import time
 import multiprocessing
-from common.init import *
+from common.points import points
+from common.Delta import db
+from common.config import *
 from common.comm import comm
 
 
@@ -23,7 +25,29 @@ from common.comm import comm
 
 
 if __name__ == '__main__':
-    com = comm(Inet=ns['serverAdr'],send_port=ns['serverPort'],listen_port=ns['listenPort'])
+    
+    f = 6.25 #fixed base radius (in)
+    rf = 7.98 #Bicep length (in)
+    re = 25 #Forearm length (in)
+    r = 2.3125  #end effector radius (in)
+    speed = 5 #bot speed (in/s)
+
+    Delta1 = db(f,rf,re,r,botSpeed=speed,servo_velocity_control=True)
+
+    length = 18
+    width = 15
+    xpoints = 7
+    ypoints = 3
+    z0 = -23.25
+
+    ps = points()
+    ps.pointfield(length,width,xpoints,ypoints,z0)
+    ps.pfShift(-length/2,-width/2,0)
+
+    retpoint = (12,0,-18)
+    lprint('points generated, delta object created')
+
+    com = comm(Inet=ns['serverAdr'],send_port=ns['serverPort'],listen_port=ns['listenPort'],delta=Delta1)
     commThread = threading.Thread(target=com.listen)
     commThread.start()
     lprint("commThread started")
