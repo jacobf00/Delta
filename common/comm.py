@@ -1,9 +1,12 @@
 import time
 import socket
 import threading
+from pathlib import Path
+import csv
 import multiprocessing
 from cryptography.fernet import Fernet
 from common.config import *
+from common.Delta import db
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection.
@@ -15,7 +18,7 @@ class comm:
     crypt = Fernet(key)
     #commands = ('move','remember','kill','updateProperty','reboot')
 
-    def __init__(self,Inet:str,send_port:int,listen_port:int,delta,encryption_enabled=True):
+    def __init__(self,Inet:str,send_port:int,listen_port:int,delta:db,encryption_enabled=True):
         self.inet = Inet
         self.sendPort = send_port
         self.listenPort = listen_port
@@ -92,6 +95,8 @@ class comm:
             currentPosition = str(self.Delta1.getCurrentPosition())
             currentPosition = currentPosition.translate(translationTable)
             toSend += currentPosition
+            points = currentPosition.split(',')
+            comm.rememberPoints(points)
         elif clientData[0] == 'updateProperty':
             threading.Thread(target=comm.updateProperty,args=(args)).start()
         else:
@@ -101,16 +106,34 @@ class comm:
         #     lprint("serverMessageHandler exception occured")
         #     lprint(e.with_traceback)
 
+    @staticmethod
     def updateProperty(propertyName:str,newValue):
         lprint("updating property: " + propertyName + " to: " + str(newValue))
         with lock:
             ns[propertyName] = newValue
 
+    @staticmethod
     def reboot():
         lprint("reboot command received from server, rebooting...")
         with lock:
             time.sleep(3)
         os.system('sudo reboot')
+
+    @staticmethod
+    def rememberPoints(points:tuple):
+        newPoints = [] #need to turn str to float first
+        for i in points:
+            newPoints.append(float(i))
+        path = Path(os.path.dirname(__file__))
+        path = path.parent.absolute()
+        newPath = path.joinpath('data','calibration_point.csv')
+        with open(newPath,'w') as file:
+            header = ['x','y','z']
+            writer = csv.writer(file,lineterminator='\n')
+            writer.writerow(header)
+            writer.writerow(newPoints)
+
+        
 
 
 

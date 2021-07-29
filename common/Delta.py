@@ -27,7 +27,7 @@ class db:
         self.servoVelocityControl = servo_velocity_control
         #position increment in inches
         self.inc = .2 #in
-        self.speed = botSpeed #in/s
+        self.setSpeed(botSpeed) #in/s
         self.dlay = self.inc/self.speed #time delay between points
         self.thetaDiff = 0 #deg
         self.theta0 = [180,180,180] #deg
@@ -100,6 +100,7 @@ class db:
         self.speed = newspeed
         try:
             self.dlay = self.inc/self.speed
+            print(f"Delta speed set to {self.speed} in/s")
         except:
             raise SpeedError(f"Seriously? what kind of speed is {newspeed}?")
 
