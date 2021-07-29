@@ -42,7 +42,7 @@ class comm:
                 else:
                     clientData = clientData.decode('UTF-8')
                 lprint("received " + clientData + " from " + str(ServerAdr))
-                response = comm.serverMessageHandler(clientData)
+                response = self.serverMessageHandler(clientData)
                 # if clientData[0] in comm.commands:
                 #     lprint("received valid command")
                 # else:
