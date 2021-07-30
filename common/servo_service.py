@@ -152,7 +152,7 @@ class servo:
         for id in ids:
             isProtocol2 = servo.syncReader.addParam(id)
             if not isProtocol2:
-                lprint(f"DXL Id {id} could not be added to syndRead")
+                lprint(f"DXL Id {id} could not be added to syncRead")
                 return None
         servo.syncReader.txRxPacket()
         pos1 = servo.syncReader.getData(ids[0],servo.ADDR_PRESENT_POSITION,servo.LEN_PRESENT_POSITION)

@@ -13,13 +13,16 @@ Delta1 = db(f,rf,re,r,botSpeed=speed)
 def moveServo(deg):
 
     thetas = (deg,deg,deg)
-    threshold = .8 #10 pulse, roughly .8 deg
+    threshold = 10 #10 pulse, roughly .8 deg
     Delta1.setAngles(thetas)
     notPrecise = True
     while notPrecise:
-        positions = Delta1.getCurrentAngles()
+        position1 = Delta1.servo1.readCurrentPosition()
+        position2 = Delta1.servo2.readCurrentPosition()
+        position3 = Delta1.servo3.readCurrentPosition()
+        positions = (position1,position2,position3)
         for pos in positions:
-            if abs(pos-deg) < threshold:
+            if abs(pos-abs(db.trans(-deg + 180))) < threshold:
                 print("Goal is met at: " + str(thetas) + ", current angles are " + str(positions))
                 notPrecise = False
 
