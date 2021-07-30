@@ -22,7 +22,7 @@ def moveServo(deg):
         position3 = Delta1.servo3.readCurrentPosition()
         positions = (position1,position2,position3)
         for pos in positions:
-            if abs(pos-abs(db.trans(-deg + 180))) < threshold:
+            if abs(pos-abs(db.trans(self=Delta1,thetaIn=(-deg + 180)))) < threshold:
                 print("Goal is met at: " + str(thetas) + ", current angles are " + str(positions))
                 notPrecise = False
 
@@ -42,6 +42,7 @@ while 1:
     moveTime += time.time()-startTime2
 
     if moveTime > (upTime*60):
+        print("Uptime reached, now starting downtime...")
         time.sleep(downTime*60)
         seconds = 0
 

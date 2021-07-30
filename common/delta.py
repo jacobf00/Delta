@@ -19,12 +19,13 @@ class ServoAdrError(Exception):
 #construct deltabot class
 class db:
 
-    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servo_velocity_control=True):
+    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servo_velocity_control=True,servo_ids:tuple=(1,2,3)):
         self.f = FixedBaseRadius
         self.rf = Bicep
         self.re = Forearm
         self.r = EndEffectorRadius
         self.servoVelocityControl = servo_velocity_control
+        self.servoIds = servo_ids
         #position increment in inches
         self.inc = .2 #in
         self.setSpeed(botSpeed) #in/s
@@ -39,17 +40,20 @@ class db:
 
     def createServos(self):
         try:
-            self.servo1 = servo(Dynamixel_ID=1)
+            self.servo1 = servo(Dynamixel_ID=self.servoIds[0])
         except:
             print("servo 1 could not be connected successfully")
         try:
-            self.servo2 = servo(Dynamixel_ID=2)
+            self.servo2 = servo(Dynamixel_ID=self.servoIds[1])
         except:
             print("servo 2 could not be connected successfully")
         try:
-            self.servo3 = servo(Dynamixel_ID=3)
+            self.servo3 = servo(Dynamixel_ID=self.servoIds[2])
         except:
             print("servo 3 could not be connected successfully")
+        self.servo1.setGoalVelocity(0)
+        self.servo2.setGoalVelocity(0)
+        self.servo3.setGoalVelocity(0)
             
             
     def updateServoRange(self):
