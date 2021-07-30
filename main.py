@@ -2,7 +2,7 @@ import common.motion
 import time
 import multiprocessing
 from common.points import points
-from common.Delta import db
+from common.delta import db
 from common.config import *
 from common.comm import comm
 

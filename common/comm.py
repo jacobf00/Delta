@@ -6,7 +6,7 @@ import csv
 import multiprocessing
 from cryptography.fernet import Fernet
 from common.config import *
-from common.Delta import db
+from common.delta import db
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection.

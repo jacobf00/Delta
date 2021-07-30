@@ -1,4 +1,4 @@
-from common.Delta import db
+from common.delta import db
 import time
 from common.points import points
 #from adafruit_servokit import ServoKit

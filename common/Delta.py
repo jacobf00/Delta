@@ -247,15 +247,18 @@ class db:
         self.setVelocities(velocities)
         self.setAngles(thetas)
 
-    def getCurrentAngles(self) -> tuple:
+    def getCurrentAngles(self,transform:bool=True) -> tuple:
         # theta0 = self.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
         # theta1 = self.trans(thetaIn=self.servo2.readCurrentPosition(),toDegrees=True)
         # theta2 = self.trans(thetaIn=self.servo3.readCurrentPosition(),toDegrees=True)
         theta0,theta1,theta2 = servo.syncReadPositions()
-        theta0 = self.trans(theta0,toDegrees=True)
-        theta1 = self.trans(theta1,toDegrees=True)
-        theta2 = self.trans(theta2,toDegrees=True)
-        return (theta0,theta1,theta2)
+        newTheta0 = self.trans(theta0,toDegrees=True)
+        newTheta1 = self.trans(theta1,toDegrees=True)
+        newTheta2 = self.trans(theta2,toDegrees=True)
+        if transform:
+            return (newTheta0,newTheta1,newTheta2)
+        else:
+            return (theta0,theta1,theta2)
 
     def getCurrentPosition(self):
         currentAngles = self.getCurrentAngles()

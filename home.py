@@ -1,4 +1,4 @@
-from Delta import db
+from common.delta import db
 import time
 #from adafruit_servokit import ServoKit
 

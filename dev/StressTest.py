@@ -1,6 +1,6 @@
 import time
 import threading
-from common.Delta import db
+from common.delta import db
 
 f = 6.25 #fixed base radius (in)
 rf = 7.98 #Bicep length (in)
@@ -13,27 +13,32 @@ Delta1 = db(f,rf,re,r,botSpeed=speed)
 def moveServo(deg):
 
     thetas = (deg,deg,deg)
-
+    threshold = .8 #10 pulse, roughly .8 deg
     Delta1.setAngles(thetas)
+    notPrecise = True
+    while notPrecise:
+        positions = Delta1.getCurrentAngles()
+        for pos in positions:
+            if abs(pos-deg) < threshold:
+                print("Goal is met at: " + str(thetas) + ", current angles are " + str(positions))
+                notPrecise = False
+
 
     
 seconds = 0
 upTime = 5 #minutes
 downTime = 3 #minutes
+curTime = 0
 while 1:
-    thread1 = threading.Thread(target=moveServo,args=(-90,))
-    thread1.start()
-    time.sleep(1)
-    thread1.join()
+    startTime1 = time.time()
+    moveServo(-90)
+    moveTime = time.time() - startTime1
 
-    thread2 = threading.Thread(target=moveServo,args=(90,))
-    thread2.start()
-    time.sleep(1)
-    thread2.join()
+    startTime2 = time.time()
+    moveServo(90)
+    moveTime += time.time()-startTime2
 
-    seconds += 2
-
-    if seconds > (upTime*60):
+    if moveTime > (upTime*60):
         time.sleep(downTime*60)
         seconds = 0
 
