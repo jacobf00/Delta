@@ -1,6 +1,4 @@
 import time
-import csv
-import numpy as np
 import threading
 from common.Delta import db
 
