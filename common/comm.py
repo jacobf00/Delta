@@ -95,8 +95,8 @@ class comm:
             currentPosition = str(self.Delta1.getCurrentPosition())
             currentPosition = currentPosition.translate(translationTable)
             toSend += currentPosition
-            points = currentPosition.split(',')
-            comm.rememberPoints(points)
+            coords = currentPosition.split(',')
+            comm.rememberPoint(coords)
         elif clientData[0] == 'updateProperty':
             threading.Thread(target=comm.updateProperty,args=(args)).start()
         else:
@@ -120,10 +120,10 @@ class comm:
         os.system('sudo reboot')
 
     @staticmethod
-    def rememberPoints(points:tuple):
-        newPoints = [] #need to turn str to float first
-        for i in points:
-            newPoints.append(float(i))
+    def rememberPoint(coords:tuple):
+        newPoint = [] #need to turn str to float first
+        for i in coords:
+            newPoint.append(float(i))
         path = Path(os.path.dirname(__file__))
         path = path.parent.absolute()
         newPath = path.joinpath('data','calibration_point.csv')
@@ -131,7 +131,7 @@ class comm:
             header = ['x','y','z']
             writer = csv.writer(file,lineterminator='\n')
             writer.writerow(header)
-            writer.writerow(newPoints)
+            writer.writerow(newPoint)
 
         
 

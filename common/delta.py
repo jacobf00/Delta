@@ -108,7 +108,8 @@ class db:
         except:
             raise SpeedError(f"Seriously? what kind of speed is {newspeed}?")
 
-    def trans(self,thetaIn:float,realServoMin=0,realServoMax=360,toDegrees=False) -> float:
+    @staticmethod
+    def trans(thetaIn:float,realServoMin=0,realServoMax=360,toDegrees=False) -> float:
         if not toDegrees:
             slope = (servo.DXL_MAXIMUM_POSITION_VALUE-servo.DXL_MINIMUM_POSITION_VALUE)/(realServoMax-realServoMin)
             thetaOut = slope*thetaIn + servo.DXL_MINIMUM_POSITION_VALUE
@@ -118,13 +119,14 @@ class db:
             thetaOut = slope*thetaIn + realServoMin
             return thetaOut
 
+    @staticmethod
     def velTrans(x,y1=servo.DXL_MAXIMUM_VELOCITY_VALUE,y0=servo.DXL_MINIMUM_VELOCITY_VALUE,x1=servo.DXL_MAXIMUM_VELOCITY_VALUE_DEG,x0=servo.DXL_MINIMUM_VELOCITY_VALUE_DEG):
         slope = (y1-y0)/(x1-x0)
         y = slope*(x-x0) + y0
         return y
 
-
-    def drop(self,seconds = .5):
+    @staticmethod
+    def drop(seconds = .5):
         if seconds is None:
             RELAY.relayON(0,1)
         else:
@@ -226,7 +228,8 @@ class db:
         y0 = (a2*z0 + b2)/dnm
         return (x0,y0,z0)
 
-    def setVelocities(self,velocities:list):
+    @staticmethod
+    def setVelocities(velocities:list):
         vel1 = abs(round(db.velTrans(velocities[0])))
         vel2 = abs(round(db.velTrans(velocities[1])))
         vel3 = abs(round(db.velTrans(velocities[2])))
@@ -236,9 +239,9 @@ class db:
 
 
     def setAngles(self,thetas:tuple):
-        theta0 = round(self.trans(-thetas[0] + self.theta0[0] + self.thetaDiff,0))
-        theta1 = round(self.trans(-thetas[1] + self.theta0[1] + self.thetaDiff,1))
-        theta2 = round(self.trans(-thetas[2] + self.theta0[2] + self.thetaDiff,2))
+        theta0 = round(db.trans(-thetas[0] + self.theta0[0] + self.thetaDiff,0))
+        theta1 = round(db.trans(-thetas[1] + self.theta0[1] + self.thetaDiff,1))
+        theta2 = round(db.trans(-thetas[2] + self.theta0[2] + self.thetaDiff,2))
         # self.servo1.setPosition(theta0)
         # self.servo2.setPosition(theta1)
         # self.servo3.setPosition(theta2)
@@ -248,30 +251,31 @@ class db:
         #time.sleep(self.dlay)
 
     def setAnglesAndVelocities(self,thetas,velocities):
-        self.setVelocities(velocities)
+        db.setVelocities(velocities)
         self.setAngles(thetas)
 
-    def getCurrentAngles(self,transform:bool=True) -> tuple:
-        # theta0 = self.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
-        # theta1 = self.trans(thetaIn=self.servo2.readCurrentPosition(),toDegrees=True)
-        # theta2 = self.trans(thetaIn=self.servo3.readCurrentPosition(),toDegrees=True)
+    @staticmethod
+    def getCurrentAngles(transform:bool=True) -> tuple:
+        # theta0 = db.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
+        # theta1 = db.trans(thetaIn=self.servo2.readCurrentPosition(),toDegrees=True)
+        # theta2 = db.trans(thetaIn=self.servo3.readCurrentPosition(),toDegrees=True)
         theta0,theta1,theta2 = servo.syncReadPositions()
-        newTheta0 = self.trans(theta0,toDegrees=True)
-        newTheta1 = self.trans(theta1,toDegrees=True)
-        newTheta2 = self.trans(theta2,toDegrees=True)
+        newTheta0 = db.trans(theta0,toDegrees=True)
+        newTheta1 = db.trans(theta1,toDegrees=True)
+        newTheta2 = db.trans(theta2,toDegrees=True)
         if transform:
             return (newTheta0,newTheta1,newTheta2)
         else:
             return (theta0,theta1,theta2)
 
     def getCurrentPosition(self):
-        currentAngles = self.getCurrentAngles()
+        currentAngles = db.getCurrentAngles()
         currentPosition = self.forward(*currentAngles)
         return currentPosition
 
 
-
-    def dist(self,point1,point2):
+    @staticmethod
+    def dist(point1,point2):
         distance = math.sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2 + (point1[2]-point2[2])**2)
         return distance
 
@@ -279,7 +283,7 @@ class db:
         '''interpolates points between two specified points in set distance increments'''
         points = []
 
-        distance = self.dist(point1,point2) #find distance between points
+        distance = db.dist(point1,point2) #find distance between points
         numpoints = round(distance/self.inc) #find number of inc dist between points
         if numpoints == 0:
             self.fmove(point2[0],point2[1],point2[2])
@@ -318,7 +322,7 @@ class db:
         newAngles = self.reverse(*newPos)
         if self.servoVelocityControl:
             diffAngles = [newAngles[0]-origAngles[0],newAngles[1]-origAngles[1],newAngles[2]-origAngles[2]] #angle sweep needed for each servo
-            distance = self.dist(origPos,newPos) #distance between current and new position in inches
+            distance = db.dist(origPos,newPos) #distance between current and new position in inches
             dt = distance/self.speed #ideal time between original and new point
             angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
             for ang in diffAngles:

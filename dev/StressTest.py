@@ -35,12 +35,14 @@ curTime = 0
 while 1:
     startTime1 = time.time()
     moveServo(-90)
-    moveTime = time.time() - startTime1
+    moveTime += time.time() - startTime1
 
     startTime2 = time.time()
     moveServo(90)
     moveTime += time.time()-startTime2
 
+    print(f"Servos have been moving for {moveTime/60} minute(s)")
+    
     if moveTime > (upTime*60):
         print("Uptime reached, now starting downtime...")
         time.sleep(downTime*60)

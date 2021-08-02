@@ -3,29 +3,30 @@ import time
 from common.points import points
 #from adafruit_servokit import ServoKit
 
+class motion:
+        
+    def fast(Delta,points,delay):
+        for p in points:
+            x,y,z = p[0],p[1],p[2]
+            Delta.fmove(x,y,z)
+            time.sleep(delay)
 
-def fast(Delta,points,delay):
-    for p in points:
-        x,y,z = p[0],p[1],p[2]
-        Delta.fmove(x,y,z)
-        time.sleep(delay)
+    def controlled(Delta,points):
+        for p in points:
+            x,y,z = p[0],p[1],p[2]
+            Delta.move(x,y,z)
 
-def controlled(Delta,points):
-    for p in points:
-        x,y,z = p[0],p[1],p[2]
-        Delta.move(x,y,z)
-
-def trays(Delta:db,points:list,returnpoint):
-    Delta.setSpeed(20)
-    for p in points:
-        x,y,z = p[0],p[1],p[2]
-        Delta.move(x,y,z)
-        Delta.retract(4)
-        #Delta.retract(-1)
-        time.sleep(.1)
-        Delta.move(returnpoint[0],returnpoint[1],returnpoint[2])
-        Delta.drop()
-        #time.sleep(.5)
+    def trays(Delta:db,points:list,returnpoint):
+        Delta.setSpeed(20)
+        for p in points:
+            x,y,z = p[0],p[1],p[2]
+            Delta.move(x,y,z)
+            Delta.retract(4)
+            #Delta.retract(-1)
+            time.sleep(.1)
+            Delta.move(returnpoint[0],returnpoint[1],returnpoint[2])
+            Delta.drop()
+            #time.sleep(.5)
 
 if __name__ == '__main__':
     
@@ -49,6 +50,6 @@ if __name__ == '__main__':
 
     retpoint = (12,0,-18)
 
-    trays(Delta1,ps.pf,retpoint)
+    motion.trays(Delta1,ps.pf,retpoint)
 
 
