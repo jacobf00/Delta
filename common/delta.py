@@ -7,7 +7,7 @@ import piplates.RELAYplate as RELAY
 #import csv
 import threading
 from common.servo_service import servo
-from common.lock_print import *
+from common.config import *
 
 #Set custom Delta exception(s)
 class SpeedError(Exception):
@@ -254,22 +254,22 @@ class db:
         db.setVelocities(velocities)
         self.setAngles(thetas)
 
-    @staticmethod
-    def getCurrentAngles(transform:bool=True) -> tuple:
+
+    def getCurrentAngles(self,transform:bool=True) -> tuple:
         # theta0 = db.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
         # theta1 = db.trans(thetaIn=self.servo2.readCurrentPosition(),toDegrees=True)
         # theta2 = db.trans(thetaIn=self.servo3.readCurrentPosition(),toDegrees=True)
         theta0,theta1,theta2 = servo.syncReadPositions()
-        newTheta0 = db.trans(theta0,toDegrees=True)
-        newTheta1 = db.trans(theta1,toDegrees=True)
-        newTheta2 = db.trans(theta2,toDegrees=True)
+        newTheta0 = self.theta0[0] - db.trans(theta0,toDegrees=True)
+        newTheta1 = self.theta0[1] - db.trans(theta1,toDegrees=True)
+        newTheta2 = self.theta0[2] - db.trans(theta2,toDegrees=True)
         if transform:
             return (newTheta0,newTheta1,newTheta2)
         else:
             return (theta0,theta1,theta2)
 
     def getCurrentPosition(self):
-        currentAngles = db.getCurrentAngles()
+        currentAngles = self.getCurrentAngles()
         currentPosition = self.forward(*currentAngles)
         return currentPosition
 
@@ -314,7 +314,7 @@ class db:
         
 
 
-    def move(self,x,y,z):
+    def move(self,x:float,y:float,z:float,threshold:float=.1): #threshold in in
         #find the current position from the servo motor angles
         origAngles = self.getCurrentAngles()
         origPos = self.forward(*origAngles)
@@ -332,6 +332,7 @@ class db:
                 or newAngles[0] > 90 or newAngles[1] > 90 or newAngles[2] > 90
                 ):
                 print("Angle is out of range")
+                toServerQueue.put("Servo angle required for movement is out of range")
                 thetas = (0,0,0)
                 thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
                 thread1.start()
@@ -341,8 +342,12 @@ class db:
                 t1 = threading.Thread(target=self.setAnglesAndVelocities,args=(newAngles,angVelocities))
                 t1.start()
                 time.sleep(dt)
-                if t1.is_alive():
-                    lprint("servos have not moved in ideal time")
+                curPos = self.getCurrentPosition()
+                if db.dist(curPos,newPos) > threshold:
+                    lprint("servos have not met goal positions in time :(")
+                    toServerQueue.put(f"End effector did not reach accuracy threshold of {threshold} inches in time")
+                elif t1.is_alive():
+                    lprint("servo pos thread running when it shouldn't")
                 t1.join()
                 # self.setVelocities(angVelocities)
                 # self.setAngles(newAngles)       

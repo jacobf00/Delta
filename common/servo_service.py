@@ -1,5 +1,5 @@
 from dynamixel_sdk import * # Uses Dynamixel SDK library
-from common.lock_print import *
+from common.config import *
 class servo:
 
     def __init__(self,Dynamixel_ID:int) -> None:

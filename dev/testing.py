@@ -89,13 +89,14 @@ d = -point.dot(normal)
 
 # #test1 = test()
 
-nums = [3,2,1]
+nums = [[1,2,3],[3,2,1]]
 
 def numPrint(num1,num2,num3):
     print(num1 + num2 + num3)
 
 for num in nums:
-    num = num + 1
-    print(num)
+    for i in num:
+        i += 1
+        print(i)
 
 print(nums)

@@ -1,9 +1,14 @@
 import os
 import time
-from common.lock_print import *
 import queue
-
+import threading
 '''contains initialized variables vital for the program'''
+
+lock = threading.Lock()
+
+def lprint(*a,**b):
+    with lock:
+        print(*a,**b)
 
 toServerQueue = queue.Queue(50)
 

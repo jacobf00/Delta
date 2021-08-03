@@ -5,23 +5,25 @@ from common.points import points
 
 class motion:
         
-    def fast(Delta,points,delay):
+    def fast(Delta:db,points,delay):
         for p in points:
             x,y,z = p[0],p[1],p[2]
             Delta.fmove(x,y,z)
             time.sleep(delay)
 
-    def controlled(Delta,points):
+    def controlled(Delta:db,points):
         for p in points:
             x,y,z = p[0],p[1],p[2]
             Delta.move(x,y,z)
 
-    def trays(Delta:db,points:list,returnpoint):
-        Delta.setSpeed(20)
+    def trays(Delta:db,pfargs:list,returnpoint,retraction_distance:float=4,delta_speed:float=0):
+        
+        if delta_speed > 0:
+            Delta.setSpeed(delta_speed)
         for p in points:
             x,y,z = p[0],p[1],p[2]
             Delta.move(x,y,z)
-            Delta.retract(4)
+            Delta.retract(retraction_distance)
             #Delta.retract(-1)
             time.sleep(.1)
             Delta.move(returnpoint[0],returnpoint[1],returnpoint[2])

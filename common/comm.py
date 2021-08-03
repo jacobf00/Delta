@@ -1,3 +1,4 @@
+from queue import Empty
 import time
 import socket
 import threading
@@ -7,6 +8,7 @@ import multiprocessing
 from cryptography.fernet import Fernet
 from common.config import *
 from common.delta import db
+from common.motion import motion
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection.
@@ -23,7 +25,6 @@ class comm:
         self.sendPort = send_port
         self.listenPort = listen_port
         self.encrytionEnabled = encryption_enabled
-        self.sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.currentServerMessage = ""
         self.Delta1 = delta
 
@@ -77,6 +78,8 @@ class comm:
         toSend = 'ok'
         if clientData[0] == 'kill':
             lprint("Kill command received...shutting down comms")
+            toServerQueue.put("Shutting down pi's comms...")
+            time.sleep(.1)
             comm.updateProperty('commRunning',False)
         elif clientData[0] == 'reboot':
             threading.Thread(target=comm.reboot).start()
@@ -106,18 +109,44 @@ class comm:
         #     lprint("serverMessageHandler exception occured")
         #     lprint(e.with_traceback)
 
+    def messageSender(self):
+        while ns['commRunning']:
+            try:
+                with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
+                    s.connect((self.inet,self.sendPort))
+                    toServer = str(toServerQueue.get())
+                    if ns['encryptionEnabled']:
+                        toServer = comm.crypt.encrypt(toServer.encode('UTF-8'))
+                    else:
+                        toServer = toServer.encode('UTF-8')
+                    s.sendall(toServer)
+            except Exception as e:
+                if Exception is Empty:
+                    print("Queue is empty")
+                else:
+                    print("Message to server failed to send")
+                    print(e)
+            finally:
+                time.sleep(.1)
+
+
+
+
     @staticmethod
     def updateProperty(propertyName:str,newValue):
         lprint("updating property: " + propertyName + " to: " + str(newValue))
+        toServerQueue.put("updating property: " + propertyName + " to: " + str(newValue))
         with lock:
             ns[propertyName] = newValue
 
     @staticmethod
     def reboot():
         lprint("reboot command received from server, rebooting...")
+        toServerQueue.put("Reboot command received...rebooting")
+        time.sleep(1)
         with lock:
             time.sleep(3)
-        os.system('sudo reboot')
+            os.system('sudo reboot')
 
     @staticmethod
     def rememberPoint(coords:tuple):
@@ -132,6 +161,7 @@ class comm:
             writer = csv.writer(file,lineterminator='\n')
             writer.writerow(header)
             writer.writerow(newPoint)
+        toServerQueue.put(f"Saved point x: {coords[0]}, y: {coords[1]}, z: {coords[2]} locally on pi")
 
         
 

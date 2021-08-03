@@ -48,10 +48,13 @@ if __name__ == '__main__':
     lprint('points generated, delta object created')
 
     com = comm(Inet=ns['serverAdr'],send_port=ns['serverPort'],listen_port=ns['listenPort'],delta=Delta1)
-    commThread = threading.Thread(target=com.listen)
-    commThread.start()
-    lprint("commThread started")
-    commThread.join()
+    listenThread = threading.Thread(target=com.listen)
+    senderThread = threading.Thread(target=com.messageSender)
+    listenThread.start()
+    senderThread.start()
+    lprint("comm threads started")
+    listenThread.join()
+    senderThread.join()
     lprint("Program finished...")
     Delta1.disableTorque()
 
