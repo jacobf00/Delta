@@ -92,6 +92,8 @@ class comm:
             for i in args:
                 newargs.append(float(i))
             threading.Thread(target=self.Delta1.move,args=(newargs)).start()
+        elif clientData[0] == 'trays':
+            pass
         elif clientData[0] == 'remember':
             toSend = 'remember:'
             translationTable = dict.fromkeys(map(ord,'() '),None)
@@ -122,10 +124,10 @@ class comm:
                     s.sendall(toServer)
             except Exception as e:
                 if Exception is Empty:
-                    print("Queue is empty")
+                    lprint("Queue is empty")
                 else:
-                    print("Message to server failed to send")
-                    print(e)
+                    lprint("Message to server failed to send")
+                    lprint(e)
             finally:
                 time.sleep(.1)
 

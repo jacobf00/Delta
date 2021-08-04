@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import threading
 import time
+import csv
 
 point  = np.array([0, 0, -20])
 normal = np.array([0, 0, 1])
@@ -89,14 +90,19 @@ d = -point.dot(normal)
 
 # #test1 = test()
 
-nums = [[1,2,3],[3,2,1]]
+nums = [1,2,3,3,2,1]
 
 def numPrint(num1,num2,num3):
     print(num1 + num2 + num3)
 
-for num in nums:
-    for i in num:
-        i += 1
-        print(i)
+# for num in nums:
+#     for i in num:
+#         i += 1
+#         print(i)
 
-print(nums)
+# print(nums)
+
+with open('dev/sample.csv') as file:
+    reader = csv.DictReader(file)
+    for row in reader:
+        print(int(row['x']))

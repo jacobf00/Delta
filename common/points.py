@@ -16,7 +16,7 @@ class points:
         
                 points.append([xcoord,ycoord,z0])
         self.pf = points
-        return points
+        return self.pf
 
     def pfShift(self,xshift,yshift,zshift):
         newpf = []

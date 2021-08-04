@@ -1,9 +1,16 @@
 from common.delta import db
+import os
 import time
 from common.points import points
+from pathlib import Path
+import csv
 #from adafruit_servokit import ServoKit
 
 class motion:
+
+    path = Path(os.path.dirname(__file__))
+    path = path.parent.absolute()
+    path = path.joinpath('data','calibration_point.csv')
         
     def fast(Delta:db,points,delay):
         for p in points:
@@ -16,11 +23,18 @@ class motion:
             x,y,z = p[0],p[1],p[2]
             Delta.move(x,y,z)
 
-    def trays(Delta:db,pfargs:list,returnpoint,retraction_distance:float=4,delta_speed:float=0):
-        
+    def trays(Delta:db,tray_length,tray_width,xpoints,ypoints,z0,returnpoint,retraction_distance:float=4,delta_speed:float=0):
+        with open(motion.path) as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                x,y,z = int(row['x']),int(row['y']),int(row['z'])
+                calibrationPoint = (x,y,z)
+        ps = points()
+        ps.pointfield(tray_length,tray_width,xpoints,ypoints,z0)
+        ps.pfShift(-tray_length/2,-tray_width/2,0)
         if delta_speed > 0:
             Delta.setSpeed(delta_speed)
-        for p in points:
+        for p in ps.pf:
             x,y,z = p[0],p[1],p[2]
             Delta.move(x,y,z)
             Delta.retract(retraction_distance)

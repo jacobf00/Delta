@@ -314,7 +314,7 @@ class db:
         
 
 
-    def move(self,x:float,y:float,z:float,threshold:float=.1): #threshold in in
+    def move(self,x:float,y:float,z:float,threshold:float=.5,velocity_multiplier:float=1.1): #threshold in in
         #find the current position from the servo motor angles
         origAngles = self.getCurrentAngles()
         origPos = self.forward(*origAngles)
@@ -326,7 +326,7 @@ class db:
             dt = distance/self.speed #ideal time between original and new point
             angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
             for ang in diffAngles:
-                angVelocities.append(ang/dt)
+                angVelocities.append(velocity_multiplier*(ang/dt))
             if (
                 newAngles[0] < -90 or newAngles[1] < -90 or newAngles[2] < -90
                 or newAngles[0] > 90 or newAngles[1] > 90 or newAngles[2] > 90
