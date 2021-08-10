@@ -23,7 +23,7 @@ class motion:
             x,y,z = p[0],p[1],p[2]
             Delta.move(x,y,z)
 
-    def trays(Delta:db,tray_length,tray_width,xpoints,ypoints,z0,returnpoint,retraction_distance:float=4,delta_speed:float=0):
+    def trays(Delta:db,tray_length,tray_width,xpoints,ypoints,z0,returnpointx,returnpointy,returnpointz,retraction_distance:float=4,delta_speed:float=0):
         with open(motion.path) as file:
             reader = csv.DictReader(file)
             for row in reader:
@@ -40,7 +40,7 @@ class motion:
             Delta.retract(retraction_distance)
             #Delta.retract(-1)
             time.sleep(.1)
-            Delta.move(returnpoint[0],returnpoint[1],returnpoint[2])
+            Delta.move(returnpointx,returnpointy,returnpointz)
             Delta.drop()
             #time.sleep(.5)
 

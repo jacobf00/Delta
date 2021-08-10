@@ -8,7 +8,7 @@ import multiprocessing
 from cryptography.fernet import Fernet
 from common.config import *
 from common.delta import db
-from common.motion import motion
+from common.motion import Delta1, motion
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection.
@@ -93,7 +93,10 @@ class comm:
                 newargs.append(float(i))
             threading.Thread(target=self.Delta1.move,args=(newargs)).start()
         elif clientData[0] == 'trays':
-            pass
+            newargs = []
+            for arg in args:
+                newargs.append(float(arg))
+            threading.Thread(target=motion.trays,args=(Delta1,*newargs)).start()
         elif clientData[0] == 'remember':
             toSend = 'remember:'
             translationTable = dict.fromkeys(map(ord,'() '),None)
@@ -116,14 +119,14 @@ class comm:
             try:
                 with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                     s.connect((self.inet,self.sendPort))
-                    toServer = str(toServerQueue.get())
+                    toServer = str(toServerQueue.get(timeout=5))
                     if ns['encryptionEnabled']:
                         toServer = comm.crypt.encrypt(toServer.encode('UTF-8'))
                     else:
                         toServer = toServer.encode('UTF-8')
                     s.sendall(toServer)
             except Exception as e:
-                if Exception is Empty:
+                if e is (Empty or TimeoutError):
                     lprint("Queue is empty")
                 else:
                     lprint("Message to server failed to send")
