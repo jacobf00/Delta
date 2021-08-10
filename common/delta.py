@@ -314,7 +314,7 @@ class db:
         
 
 
-    def move(self,x:float,y:float,z:float,threshold:float=.5,velocity_multiplier:float=1.1): #threshold in in
+    def move(self,x:float,y:float,z:float,threshold:float=.5,velocity_multiplier:float=1.2): #threshold in in
         #find the current position from the servo motor angles
         origAngles = self.getCurrentAngles()
         origPos = self.forward(*origAngles)

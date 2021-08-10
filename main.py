@@ -34,6 +34,8 @@ if __name__ == '__main__':
 
     Delta1 = db(f,rf,re,r,botSpeed=speed,servo_velocity_control=True)
 
+    Delta1.home()
+
     length = 18
     width = 15
     xpoints = 7
