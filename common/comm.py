@@ -122,7 +122,7 @@ class comm:
             try:
                 with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                     toServer = str(toServerQueue.get())
-                    if toServer != None:
+                    if toServer != str(None):
                         s.connect((self.inet,self.sendPort))
                         if ns['encryptionEnabled']:
                             toServer = comm.crypt.encrypt(toServer.encode('UTF-8'))
