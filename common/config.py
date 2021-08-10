@@ -5,7 +5,7 @@ import threading
 import logging
 '''contains initialized variables vital for the program'''
 
-logging.basicConfig(filename='data/runtime.log',encoding='utf-8',level=logging.INFO)
+logging.basicConfig(filename='data/runtime.log',level=logging.INFO)
 
 lock = threading.Lock()
 

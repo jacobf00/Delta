@@ -66,6 +66,6 @@ if __name__ == '__main__':
 
     retpoint = (12,0,-18)
 
-    motion.trays(Delta1,ps.pf,retpoint)
+    motion.trays(Delta1,length,width,xpoints,ypoints,z0,retpoint[0],retpoint[1],retpoint[2])
 
 

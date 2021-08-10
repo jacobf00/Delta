@@ -8,7 +8,7 @@ import multiprocessing
 from cryptography.fernet import Fernet
 from common.config import *
 from common.delta import db
-from common.motion import Delta1, motion
+from common.motion import motion
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection.
@@ -96,7 +96,7 @@ class comm:
             newargs = []
             for arg in args:
                 newargs.append(float(arg))
-            threading.Thread(target=motion.trays,args=(Delta1,*newargs)).start()
+            threading.Thread(target=motion.trays,args=(self.Delta1,*newargs)).start()
         elif clientData[0] == 'remember':
             toSend = 'remember:'
             translationTable = dict.fromkeys(map(ord,'() '),None)
