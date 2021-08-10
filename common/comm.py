@@ -9,6 +9,7 @@ from cryptography.fernet import Fernet
 from common.config import *
 from common.delta import db
 from common.motion import motion
+import sys
 
 class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection.
@@ -81,6 +82,8 @@ class comm:
             toServerQueue.put("Shutting down pi's comms...")
             time.sleep(.1)
             comm.updateProperty('commRunning',False)
+            time.sleep(.5)
+            toServerQueue.put(None)
         elif clientData[0] == 'reboot':
             threading.Thread(target=comm.reboot).start()
         elif clientData[0] == 'hello':
@@ -118,19 +121,16 @@ class comm:
         while ns['commRunning']:
             try:
                 with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
-                    s.connect((self.inet,self.sendPort))
-                    toServer = str(toServerQueue.get(timeout=5))
-                    if ns['encryptionEnabled']:
-                        toServer = comm.crypt.encrypt(toServer.encode('UTF-8'))
-                    else:
-                        toServer = toServer.encode('UTF-8')
-                    s.sendall(toServer)
-            except Exception as e:
-                if e is (Empty or TimeoutError):
-                    lprint("Queue is empty")
-                else:
-                    lprint("Message to server failed to send")
-                    lprint(e)
+                    toServer = str(toServerQueue.get())
+                    if toServer != None:
+                        s.connect((self.inet,self.sendPort))
+                        if ns['encryptionEnabled']:
+                            toServer = comm.crypt.encrypt(toServer.encode('UTF-8'))
+                        else:
+                            toServer = toServer.encode('UTF-8')
+                        s.sendall(toServer)
+            except :
+                lprint(f"Oops!  + {sys.exc_info()[0]} occurred.")
             finally:
                 time.sleep(.1)
 
