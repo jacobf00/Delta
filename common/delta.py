@@ -19,7 +19,7 @@ class ServoAdrError(Exception):
 #construct deltabot class
 class db:
 
-    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servo_velocity_control=True,servo_ids:tuple=(1,2,3)):
+    def __init__(self, FixedBaseRadius, Bicep, Forearm, EndEffectorRadius, botSpeed:float=12,servo_velocity_control=True,servo_ids:tuple=(1,2,3),angle_range:float=90):
         self.f = FixedBaseRadius
         self.rf = Bicep
         self.re = Forearm
@@ -32,6 +32,7 @@ class db:
         self.dlay = self.inc/self.speed #time delay between points
         self.thetaDiff = 0 #deg
         self.theta0 = [180,180,180] #deg
+        self.angle_range = angle_range
         #initialize servos
         # self.minServo = 0
         # self.maxServo = 180
@@ -51,9 +52,9 @@ class db:
             self.servo3 = servo(Dynamixel_ID=self.servoIds[2])
         except:
             print("servo 3 could not be connected successfully")
-        self.servo1.setGoalVelocity(0)
-        self.servo2.setGoalVelocity(0)
-        self.servo3.setGoalVelocity(0)
+        self.servo1.setProfileVelocity(0)
+        self.servo2.setProfileVelocity(0)
+        self.servo3.setProfileVelocity(0)
             
             
     def updateServoRange(self):
@@ -172,6 +173,8 @@ class db:
             return (theta1, theta2, theta3)
         except:
             print("The point is outside of the bot's reach")
+            logging.warn(f"Servo angles cannot be calculated for the point given: X: {x0}, Y: {y0}, Z: {z0}")
+            toServerQueue.put(f"Servo angles cannot be calculated for the point given: X: {x0}, Y: {y0}, Z: {z0}")
             return (0,0,0)
 
     def forward(self, theta1, theta2, theta3):
@@ -221,6 +224,9 @@ class db:
         # discriminant
         d = b*b - 4.0*a*c
         if d < 0:
+            print(f"Coordinates cannot be calculated for the servo angles given: theta1: {theta1}, theta2: {theta2}, theta3: {theta3}")
+            logging.warn(f"Coordinates cannot be calculated for the servo angles given: theta1: {theta1}, theta2: {theta2}, theta3: {theta3}")
+            toServerQueue.put(f"Coordinates cannot be calculated for the servo angles given: theta1: {theta1}, theta2: {theta2}, theta3: {theta3}")
             return None # non-existing point
 
         z0 = -0.5*(b+math.sqrt(d))/a
@@ -328,11 +334,12 @@ class db:
             for ang in diffAngles:
                 angVelocities.append(velocity_multiplier*(ang/dt))
             if (
-                newAngles[0] < -90 or newAngles[1] < -90 or newAngles[2] < -90
-                or newAngles[0] > 90 or newAngles[1] > 90 or newAngles[2] > 90
+                newAngles[0] < -self.angle_range or newAngles[1] < -self.angle_range or newAngles[2] < -self.angle_range
+                or newAngles[0] > self.angle_range or newAngles[1] > self.angle_range or newAngles[2] > self.angle_range
                 ):
                 print("Angle is out of range")
-                toServerQueue.put("Servo angle required for movement is out of range")
+                logging.warn(f"Calculated angle is out of defined servo range of {self.angle_range}")
+                toServerQueue.put(f"Calculated angle is out of defined servo range of {self.angle_range}")
                 thetas = (0,0,0)
                 thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
                 thread1.start()
@@ -344,7 +351,8 @@ class db:
                 time.sleep(dt)
                 curPos = self.getCurrentPosition()
                 if db.dist(curPos,newPos) > threshold:
-                    lprint("servos have not met goal positions in time :(")
+                    print("servos have not met goal positions in time :(")
+                    logging.warn("servos have not met goal positions in time :(")
                     toServerQueue.put(f"End effector did not reach accuracy threshold of {threshold} inches in time")
                 elif t1.is_alive():
                     lprint("servo pos thread running when it shouldn't")
@@ -360,8 +368,8 @@ class db:
                 for ps in points:
                     thetas = self.reverse(ps[0],ps[1],ps[2])
                     if (
-                        thetas[0] < -75 or thetas[1] < -75 or thetas[2] < -75
-                        or thetas[0] > 75 or thetas[1] > 75 or thetas[2] > 75
+                        thetas[0] < -self.angle_range or thetas[1] < -self.angle_range or thetas[2] < -self.angle_range
+                        or thetas[0] > self.angle_range or thetas[1] > self.angle_range or thetas[2] > self.angle_range
                         ):
                         print("Angle is out of range")
                         thetas = (0,0,0)
@@ -384,12 +392,13 @@ class db:
         thetas = self.reverse(x,y,z)
         try:
             self.setAngles(thetas)
-        except ValueError:
+        except:
             print("shitty servo no go brrrrrr")
+            logging.warn("servo fast move failed")
 
 
-    def retract(self,RetractDist):
-        ret = RetractDist
+    def retract(self,retraction_distance:float=4):
+        ret = retraction_distance
         #find current position
         pos = self.forward(*self.getCurrentAngles())
         #add retraction distance to position
