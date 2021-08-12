@@ -104,7 +104,7 @@ class servo:
         lprint("Succeeded to open the port")
     else:
         lprint("Failed to open the port")
-        lprint("Press any key to terminate...")
+        logging.warn("Failed to open port")
         quit()
 
 
@@ -113,7 +113,7 @@ class servo:
         lprint("Succeeded to change the baudrate")
     else:
         lprint("Failed to change the baudrate")
-        lprint("Press any key to terminate...")
+        logging.warn("failed to change baudrate")
         quit()
 
     syncReader = GroupSyncRead(port=portHandler,ph=packetHandler,start_address=ADDR_PRESENT_POSITION,data_length=LEN_PRESENT_POSITION)
@@ -144,6 +144,7 @@ class servo:
         dxl_comm_result = servo.groupBulkWrite.txPacket()
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            logging.warn(f"bulkWrite failed: {servo.packetHandler.getTxRxResult(dxl_comm_result)}")
         servo.groupBulkWrite.clearParam()
 
     @staticmethod
@@ -153,6 +154,7 @@ class servo:
             isProtocol2 = servo.syncReader.addParam(id)
             if not isProtocol2:
                 lprint(f"DXL Id {id} could not be added to syncRead")
+                logging.warn(f"DXL Id {id} could not be added to syncRead")
                 return None
         servo.syncReader.txRxPacket()
         pos1 = servo.syncReader.getData(ids[0],servo.ADDR_PRESENT_POSITION,servo.LEN_PRESENT_POSITION)
@@ -178,9 +180,12 @@ class servo:
     def setControlTableValue1Byte(self,address:int,value:int): 
         dxl_comm_result, dxl_error = servo.packetHandler.write1ByteTxRx(servo.portHandler, self.DXL_ID, address, value)
         if dxl_comm_result != COMM_SUCCESS:
-            lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            print("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            logging.warn(f"setControlTableValue failed: {servo.packetHandler.getTxRxResult(dxl_comm_result)}")
         elif dxl_error != 0:
-            lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            print("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            logging.warn(f"setControlTableValue failed: {servo.packetHandler.getRxPacketError(dxl_error)}")
+
         else:
             return True
             #lprint("Control table value changed successfully")
@@ -188,9 +193,11 @@ class servo:
     def setControlTableValue4Byte(self,address:int,value:int): 
         dxl_comm_result, dxl_error = servo.packetHandler.write4ByteTxRx(servo.portHandler, self.DXL_ID, address, value)
         if dxl_comm_result != COMM_SUCCESS:
-            lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            print("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            logging.warn(f"setControlTableValue failed: {servo.packetHandler.getTxRxResult(dxl_comm_result)}")
         elif dxl_error != 0:
-            lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            print("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            logging.warn(f"setControlTableValue failed: {servo.packetHandler.getRxPacketError(dxl_error)}")
         else:
             return True
             #lprint("Control table value changed successfully")
@@ -201,18 +208,23 @@ class servo:
         else:
             tableValue, dxl_comm_result, dxl_error = servo.packetHandler.read4ByteTxRx(servo.portHandler, self.DXL_ID, address)
         if dxl_comm_result != COMM_SUCCESS:
-            lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            print("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            logging.warn(f"readControlTableValue failed: {servo.packetHandler.getTxRxResult(dxl_comm_result)}")
         elif dxl_error != 0:
-            lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            print("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            logging.warn(f"readControlTableValue failed: {servo.packetHandler.getRxPacketError(dxl_error)}")
         return tableValue
 
     def enableTorque(self):
         # Enable Dynamixel Torque
         dxl_comm_result, dxl_error = servo.packetHandler.write1ByteTxRx(servo.portHandler, self.DXL_ID, servo.ADDR_TORQUE_ENABLE, servo.TORQUE_ENABLE)
         if dxl_comm_result != COMM_SUCCESS:
-            lprint("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            print("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            logging.warn(f"Could not connect to Dynamixel {self.DXL_ID}: {servo.packetHandler.getTxRxResult(dxl_comm_result)}")
         elif dxl_error != 0:
-            lprint("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            print("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            logging.warn(f"Could not connect to Dynamixel {self.DXL_ID}: {servo.packetHandler.getRxPacketError(dxl_error)}")
+
         else:
             lprint(f"Dynamixel {self.DXL_ID} has been successfully connected")
 
