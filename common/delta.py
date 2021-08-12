@@ -243,7 +243,7 @@ class db:
         vel3 = abs(round(db.velTrans(velocities[2])))
         servo.bulkWriteVelocities(vel1,vel2,vel3)
         lprint(f"setting servo goal velocities to 1: {round(velocities[0],2)}, 2: {round(velocities[1],2)}, 3: {round(velocities[2],2)} deg/sec")
-        lprint(f"setting servo goal velocities to 1: {vel1}, 2: {vel2}, 3: {vel3} pulse")
+        print(f"setting servo goal velocities to 1: {vel1}, 2: {vel2}, 3: {vel3} pulse")
 
 
     def setAngles(self,thetas:tuple):

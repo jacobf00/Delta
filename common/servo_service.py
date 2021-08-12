@@ -139,6 +139,7 @@ class servo:
             dxl_addparam_result = servo.groupBulkWrite.addParam(id, address, servo.LEN_GOAL_POSITION, param_goal_position)
             if dxl_addparam_result != True:
                 print("[ID:%03d] groupBulkWrite addparam failed" % id)
+                logging.warn("[ID:%03d] groupBulkWrite addparam failed" % id)
                 quit()
         # Bulkwrite goal positions
         dxl_comm_result = servo.groupBulkWrite.txPacket()

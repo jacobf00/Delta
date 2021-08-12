@@ -135,8 +135,6 @@ class comm:
                 time.sleep(.1)
 
 
-
-
     @staticmethod
     def updateProperty(propertyName:str,newValue):
         lprint("updating property: " + propertyName + " to: " + str(newValue))
