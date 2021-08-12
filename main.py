@@ -43,7 +43,7 @@ if __name__ == '__main__':
     z0 = -23.25
 
     ps = points()
-    ps.pointfield(length,width,xpoints,ypoints,z0)
+    ps.pointField(length,width,xpoints,ypoints,z0)
     ps.pfShift(-length/2,-width/2,0)
 
     retpoint = (12,0,-18)

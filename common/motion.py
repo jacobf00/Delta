@@ -38,7 +38,7 @@ class motion:
         else:
             calibrationPoint = (calibrationx,calibrationy,calibrationz)
         ps = points()
-        ps.pointfield(tray_length,tray_width,xpoints,ypoints,z0)
+        ps.pointField(tray_length,tray_width,xpoints,ypoints,z0)
         #this is assuming robot is mounted exactly in the center of the tray
         ps.pfShift(-tray_length/2,-tray_width/2,0)
         first_point = ps.pf[0]
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     z0 = -23.25
 
     ps = points()
-    ps.pointfield(length,width,xpoints,ypoints,z0)
+    ps.pointField(length,width,xpoints,ypoints,z0)
     ps.pfShift(-length/2,-width/2,0)
 
     retpoint = (12,0,-18)

@@ -7,7 +7,7 @@ class points:
         self.pf = []
         self.c = []
         
-    def pointfield(self,length,width,xpoints,ypoints,z0):
+    def pointField(self,length,width,xpoints,ypoints,z0):
         points = []
         for y in range(ypoints):
             for x in range(xpoints):
@@ -19,6 +19,7 @@ class points:
         return self.pf
 
     def pfShift(self,xshift,yshift,zshift):
+        '''Shifts every point in the self.pf list by a set x,y,z amount.'''
         newpf = []
         for p in self.pf:
             p[0] += xshift
