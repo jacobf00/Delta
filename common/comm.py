@@ -15,7 +15,7 @@ class comm:
     '''Class for streamlining communication with server application. Input Inet address and port to establish connection.
     Class also contains various methods necessary for controlling pi/robot that are relevant to communication with java server'''
 
-    with open('data/key.key','rb') as file:
+    with open('Delta/data/key.key','rb') as file:
         key = file.read()
 
     crypt = Fernet(key)
