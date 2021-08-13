@@ -14,3 +14,6 @@ home.py can be ran from putty and just homes the robot.
 Only important files in data folder is key.key which is needed for encryption and runtime.log which will show how the robot is operating. LOOK FOR WARNINGS.  
   
 Nothing important in dev, this is used for testing.  
+  
+WHEN INSTALLING ROBOT:  
+Points will likely not be in the right orientation, make sure to mount robot directly in the center of the trays to have the points line up, if this is not possible you will have to use the pfShift method to shift the points to where you need them. Make sure z0 level is accurate, and if the calibration point on the first bottle is accurate, it should shift the rest of the points to where they need to be.  MAKE SURE TRAYS ARE ORIENTED STRAIGHT AND ARE LEVEL. If the orientation of the points is off by 90 degrees, switch length/width and xpoints/ypoints parameters in code and it should fix it.

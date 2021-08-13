@@ -17,10 +17,12 @@ class servo:
         dxl_comm_result, dxl_error = servo.packetHandler.reboot(servo.portHandler, self.DXL_ID)
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % servo.packetHandler.getTxRxResult(dxl_comm_result))
+            logging.warn(f"reboot failed: {servo.packetHandler.getTxRxResult(dxl_comm_result)}")
         elif dxl_error != 0:
             print("%s" % servo.packetHandler.getRxPacketError(dxl_error))
+            logging.warn(f"reboot failed: {servo.packetHandler.getRxPacketError(dxl_error)}")
         else:
-            print("[ID:%03d] reboot Succeeded\n" % self.DXL_ID)
+            lprint("[ID:%03d] reboot Succeeded\n" % self.DXL_ID)
 
 
 

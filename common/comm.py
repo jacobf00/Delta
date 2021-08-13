@@ -26,7 +26,6 @@ class comm:
         self.sendPort = send_port
         self.listenPort = listen_port
         self.encrytionEnabled = encryption_enabled
-        self.currentServerMessage = ""
         self.Delta1 = delta
 
     def listen(self):
@@ -85,7 +84,8 @@ class comm:
             time.sleep(.5)
             toServerQueue.put(None)
         elif clientData[0] == 'reboot':
-            threading.Thread(target=comm.reboot).start()
+            #threading.Thread(target=comm.reboot).start()
+            comm.reboot()
         elif clientData[0] == 'hello':
             toSend = 'hello'
         elif clientData[0] == 'home':

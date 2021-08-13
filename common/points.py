@@ -42,7 +42,7 @@ class points:
             points.append([x,y,z])
 
         self.c = points
-        return points
+        return self.c
 
 
 
