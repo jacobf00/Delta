@@ -262,6 +262,16 @@ class db:
         db.setVelocities(velocities)
         self.setAngles(thetas)
 
+    def getMoving(self) -> bool:
+        if self.servo1.getMoving():
+            return True
+        elif self.servo2.getMoving():
+            return True
+        elif self.servo3.getMoving():
+            return True
+        else:
+            return False
+
 
     def getCurrentAngles(self,transform:bool=True) -> tuple:
         # theta0 = db.trans(thetaIn=self.servo1.readCurrentPosition(),toDegrees=True)
@@ -323,70 +333,75 @@ class db:
 
 
     def move(self,x:float,y:float,z:float,threshold:float=.5,velocity_multiplier:float=1.2): #threshold in in
-        #find the current position from the servo motor angles
-        origAngles = self.getCurrentAngles()
-        origPos = self.forward(*origAngles)
-        newPos = (x,y,z)
-        newAngles = self.reverse(*newPos)
-        if self.servoVelocityControl:
-            diffAngles = [newAngles[0]-origAngles[0],newAngles[1]-origAngles[1],newAngles[2]-origAngles[2]] #angle sweep needed for each servo
-            distance = db.dist(origPos,newPos) #distance between current and new position in inches
-            dt = distance/self.speed #ideal time between original and new point
-            angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
-            for ang in diffAngles:
-                angVelocities.append(velocity_multiplier*(ang/dt))
-            if (
-                newAngles[0] < -self.angle_range or newAngles[1] < -self.angle_range or newAngles[2] < -self.angle_range
-                or newAngles[0] > self.angle_range or newAngles[1] > self.angle_range or newAngles[2] > self.angle_range
-                ):
-                print("Angle is out of range")
-                logging.warn(f"Calculated angle is out of defined servo range of {self.angle_range}")
-                toServerQueue.put(f"Calculated angle is out of defined servo range of {self.angle_range}")
-                thetas = (0,0,0)
-                thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
-                thread1.start()
-                time.sleep(self.dlay)
-                thread1.join()
-            else:
-                t1 = threading.Thread(target=self.setAnglesAndVelocities,args=(newAngles,angVelocities))
-                t1.start()
-                time.sleep(dt)
-                curPos = self.getCurrentPosition()
-                if db.dist(curPos,newPos) > threshold:
-                    print("servos have not met goal positions in time :(")
-                    logging.warn("servos have not met goal positions in time :(")
-                    toServerQueue.put(f"End effector did not reach accuracy threshold of {threshold} inches in time")
-                elif t1.is_alive():
-                    lprint("servo pos thread running when it shouldn't")
-                t1.join()
-                # self.setVelocities(angVelocities)
-                # self.setAngles(newAngles)       
+        if self.getMoving():
+            print("Delta still moving, cannot set new position")
+            logging.warn("Tried to set new position while robot still moving, failed.")
+            toServerQueue.put("Tried to set new position while robot still moving, failed.")
         else:
-            points = self.interp(origPos,newPos)
+            #find the current position from the servo motor angles
+            origAngles = self.getCurrentAngles()
+            origPos = self.forward(*origAngles)
+            newPos = (x,y,z)
+            newAngles = self.reverse(*newPos)
+            if self.servoVelocityControl:
+                diffAngles = [newAngles[0]-origAngles[0],newAngles[1]-origAngles[1],newAngles[2]-origAngles[2]] #angle sweep needed for each servo
+                distance = db.dist(origPos,newPos) #distance between current and new position in inches
+                dt = distance/self.speed #ideal time between original and new point
+                angVelocities = [] #list that contains the ideal average angular velocity of each servo in deg/sec
+                for ang in diffAngles:
+                    angVelocities.append(velocity_multiplier*(ang/dt))
+                if (
+                    newAngles[0] < -self.angle_range or newAngles[1] < -self.angle_range or newAngles[2] < -self.angle_range
+                    or newAngles[0] > self.angle_range or newAngles[1] > self.angle_range or newAngles[2] > self.angle_range
+                    ):
+                    print("Angle is out of range")
+                    logging.warn(f"Calculated angle is out of defined servo range of {self.angle_range}")
+                    toServerQueue.put(f"Calculated angle is out of defined servo range of {self.angle_range}")
+                    thetas = (0,0,0)
+                    thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
+                    thread1.start()
+                    time.sleep(self.dlay)
+                    thread1.join()
+                else:
+                    t1 = threading.Thread(target=self.setAnglesAndVelocities,args=(newAngles,angVelocities))
+                    t1.start()
+                    time.sleep(dt)
+                    curPos = self.getCurrentPosition()
+                    if db.dist(curPos,newPos) > threshold:
+                        print("servos have not met goal positions in time :(")
+                        logging.warn("servos have not met goal positions in time :(")
+                        toServerQueue.put(f"End effector did not reach accuracy threshold of {threshold} inches in time")
+                    elif t1.is_alive():
+                        lprint("servo pos thread running when it shouldn't")
+                    t1.join()
+                    # self.setVelocities(angVelocities)
+                    # self.setAngles(newAngles)       
+            else:
+                points = self.interp(origPos,newPos)
 
-            #now loop through interpolated points
-            if points != None:
+                #now loop through interpolated points
+                if points != None:
 
-                for ps in points:
-                    thetas = self.reverse(ps[0],ps[1],ps[2])
-                    if (
-                        thetas[0] < -self.angle_range or thetas[1] < -self.angle_range or thetas[2] < -self.angle_range
-                        or thetas[0] > self.angle_range or thetas[1] > self.angle_range or thetas[2] > self.angle_range
-                        ):
-                        print("Angle is out of range")
-                        thetas = (0,0,0)
-                        thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
-                        thread1.start()
-                        time.sleep(self.dlay)
-                        thread1.join()
-                    else:
-                        try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
+                    for ps in points:
+                        thetas = self.reverse(ps[0],ps[1],ps[2])
+                        if (
+                            thetas[0] < -self.angle_range or thetas[1] < -self.angle_range or thetas[2] < -self.angle_range
+                            or thetas[0] > self.angle_range or thetas[1] > self.angle_range or thetas[2] > self.angle_range
+                            ):
+                            print("Angle is out of range")
+                            thetas = (0,0,0)
                             thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
                             thread1.start()
                             time.sleep(self.dlay)
                             thread1.join()
-                        except ValueError:
-                            print("shitty servo no go brrrrrr")
+                        else:
+                            try: #theta0 and thetaDiff shift angle into servo axes, trans function maps new angle onto calibrated servo range
+                                thread1 = threading.Thread(target=self.setAngles,args=(thetas,))
+                                thread1.start()
+                                time.sleep(self.dlay)
+                                thread1.join()
+                            except ValueError:
+                                print("shitty servo no go brrrrrr")
 
 
     def fmove(self,x,y,z):

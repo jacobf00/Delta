@@ -99,7 +99,12 @@ class comm:
             newargs = []
             for arg in args:
                 newargs.append(float(arg))
-            threading.Thread(target=motion.trays,args=(self.Delta1,*newargs)).start()
+            if self.Delta1.getMoving():
+                print("trays failed, delta still moving")
+                logging.warn("Trays program failed to initiate...Robot is still in motion")
+                toServerQueue.put("Trays program failed to initiate...Robot is still in motion")
+            else:
+                threading.Thread(target=motion.trays,args=(self.Delta1,*newargs)).start()
         elif clientData[0] == 'remember':
             toSend = 'remember:'
             translationTable = dict.fromkeys(map(ord,'() '),None)

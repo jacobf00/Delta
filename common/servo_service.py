@@ -42,7 +42,8 @@ class servo:
         ADDR_TORQUE_ENABLE          = 64
         ADDR_GOAL_POSITION          = 116
         ADDR_PRESENT_POSITION       = 132
-        ADDR_PROFILE_VELOCITY          = 112
+        ADDR_PROFILE_VELOCITY       = 112
+        ADDR_MOVING                 = 122
         LEN_GOAL_POSITION           = 4         # Data Byte Length
         LEN_PRESENT_POSITION        = 4         # Data Byte Length
         ADDR_ID                     = 7
@@ -166,8 +167,15 @@ class servo:
         servo.syncReader.clearParam()
         return (pos1,pos2,pos3)
 
-
-
+    def getMoving() -> bool:
+        value = servo.readControlTableValue(address=servo.ADDR_MOVING,oneByte=True)
+        if value == 1:
+            return True
+        elif value == 0:
+            return False
+        else:
+            logging.warn("moving status error")
+            
     def setProfileVelocity(self,velocity:int):
         succeeded = self.setControlTableValue4Byte(servo.ADDR_PROFILE_VELOCITY,velocity)
         if succeeded:
@@ -205,9 +213,11 @@ class servo:
             return True
             #lprint("Control table value changed successfully")
 
-    def readControlTableValue(self,address:int) -> int:
+    def readControlTableValue(self,address:int,oneByte:bool=False) -> int:
         if (servo.MY_DXL == 'XL320'): # XL320 uses 2 byte Position Data, Check the size of data in your DYNAMIXEL's control table
             tableValue, dxl_comm_result, dxl_error = servo.packetHandler.read2ByteTxRx(servo.portHandler, self.DXL_ID, address)
+        elif oneByte:
+            tableValue, dxl_comm_result, dxl_error = servo.packetHandler.read1ByteTxRx(servo.portHandler, self.DXL_ID, address)
         else:
             tableValue, dxl_comm_result, dxl_error = servo.packetHandler.read4ByteTxRx(servo.portHandler, self.DXL_ID, address)
         if dxl_comm_result != COMM_SUCCESS:
