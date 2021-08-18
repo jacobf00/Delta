@@ -78,10 +78,10 @@ class comm:
         toSend = 'ok'
         if clientData[0] == 'kill':
             lprint("Kill command received...shutting down comms")
-            toServerQueue.put("Shutting down pi's comms...")
+            #toServerQueue.put("Shutting down pi's comms...")
             time.sleep(.1)
             comm.updateProperty('commRunning',False)
-            time.sleep(1)
+            time.sleep(1.5)
             toServerQueue.put(None)
         elif clientData[0] == 'reboot':
             #threading.Thread(target=comm.reboot).start()
