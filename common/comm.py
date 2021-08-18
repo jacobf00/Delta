@@ -143,7 +143,8 @@ class comm:
     @staticmethod
     def updateProperty(propertyName:str,newValue):
         lprint("updating property: " + propertyName + " to: " + str(newValue))
-        toServerQueue.put("updating property: " + propertyName + " to: " + str(newValue))
+        if propertyName != 'commRunning':
+            toServerQueue.put("updating property: " + propertyName + " to: " + str(newValue))
         with lock:
             ns[propertyName] = newValue
 
