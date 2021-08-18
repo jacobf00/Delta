@@ -81,7 +81,7 @@ class comm:
             toServerQueue.put("Shutting down pi's comms...")
             time.sleep(.1)
             comm.updateProperty('commRunning',False)
-            time.sleep(.5)
+            time.sleep(1)
             toServerQueue.put(None)
         elif clientData[0] == 'reboot':
             #threading.Thread(target=comm.reboot).start()

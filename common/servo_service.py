@@ -167,15 +167,15 @@ class servo:
         servo.syncReader.clearParam()
         return (pos1,pos2,pos3)
 
-    def getMoving() -> bool:
-        value = servo.readControlTableValue(address=servo.ADDR_MOVING,oneByte=True)
+    def getMoving(self) -> bool:
+        value = self.readControlTableValue(address=servo.ADDR_MOVING,oneByte=True)
         if value == 1:
             return True
         elif value == 0:
             return False
         else:
             logging.warn("moving status error")
-            
+
     def setProfileVelocity(self,velocity:int):
         succeeded = self.setControlTableValue4Byte(servo.ADDR_PROFILE_VELOCITY,velocity)
         if succeeded:
