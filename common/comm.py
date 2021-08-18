@@ -82,7 +82,7 @@ class comm:
             time.sleep(.1)
             comm.updateProperty('commRunning',False)
             time.sleep(1.5)
-            toServerQueue.put(None)
+            toServerQueue.put(str(None))
         elif clientData[0] == 'reboot':
             #threading.Thread(target=comm.reboot).start()
             comm.reboot()
